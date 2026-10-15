@@ -2,6 +2,8 @@
 
 [English](README.md) · [Español](README.es.md) · [繁體中文](README.zh-TW.md)
 
+儲存庫：[tianrking/mori-muse-gadgets](https://github.com/tianrking/mori-muse-gadgets)。
+
 適用於 **Spotpear ESP32-S3 1.8 吋圓形 LCD V1** 的原生 **ESP-IDF 6.1** 韌體、React 網頁聊天客戶端，以及連接 Muse 官方服務的 Cloudflare Worker 中轉。
 
 網頁與中轉可放在同一個 Worker。現有個人部署：[muse.2fast.cfd](https://muse.2fast.cfd/)。也可自行部署。實際連線能力與延遲取決於所在地網路、Cloudflare 和官方服務，未保證全球可達、加速效果或免代理存取。
@@ -181,7 +183,7 @@ workers.dev 位址可同時作為網頁及中轉入口，也可在 Cloudflare �
 - 避免 MCU、Linux 服務與網頁同時更新同一份憑證。
 - PC 能連線不代表 MCU 的 Wi-Fi 能連線。[Windows 代理熱點操作紀錄](docs/NETWORK-HOTSPOT.zh-CN.md) 保留已成功的方法；重用前應檢查其本機路徑及熱點密碼。
 
-應提交原始碼、鎖定檔、範本與說明，保留 `secrets/`、建置產物、封包擷取、`.dev.vars`、本機 Wrangler 設定與 `.env.local` 在本機。韌體二進位含有 SDK token，不應隨意發布。推送前檢查受追蹤檔案和歷史中的真實憑證。儲存庫已有逐步本機提交，遠端位址待擁有者提供後再加入。
+應提交原始碼、鎖定檔、範本與說明，保留 `secrets/`、建置產物、封包擷取、`.dev.vars`、本機 Wrangler 設定與 `.env.local` 在本機。韌體二進位含有 SDK token，不應隨意發布。推送前檢查受追蹤檔案和歷史中的真實憑證。儲存庫保留逐步提交歷史，作者與提交者統一使用 tianrking 的 GitHub 身分。
 
 ## 授權與來源
 

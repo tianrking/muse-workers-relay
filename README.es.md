@@ -2,6 +2,8 @@
 
 [English](README.md) · [Español](README.es.md) · [繁體中文](README.zh-TW.md)
 
+Repositorio: [tianrking/mori-muse-gadgets](https://github.com/tianrking/mori-muse-gadgets).
+
 Firmware nativo con **ESP-IDF 6.1** para la **Spotpear ESP32-S3 con pantalla circular de 1,8 pulgadas V1**, un cliente web React y un relay de Cloudflare Workers para conectar con los servicios oficiales de Muse.
 
 La web y el relay funcionan en un solo Worker. Instancia personal actual: [muse.2fast.cfd](https://muse.2fast.cfd/). Puedes alojar tu propia instancia. No se garantiza acceso desde cualquier país, menor latencia ni funcionamiento sin proxy: depende de la red y del servicio oficial.
@@ -177,7 +179,7 @@ Ready no prueba conexión a la nube: revisa HTTP y Noise. Ante 401, distingue to
 
 La conectividad del PC no demuestra la del MCU. La [guía del hotspot Windows con proxy](docs/NETWORK-HOTSPOT.zh-CN.md) conserva el procedimiento probado; revisa sus rutas y contraseña antes de reutilizarlo.
 
-Versiona código, lockfiles, documentación y plantillas. Mantén privados `secrets/`, builds, capturas de red, `.dev.vars`, configuración local Wrangler y `.env.local`. Los binarios contienen el token SDK. Revisa archivos e historial antes de push. Existen commits locales incrementales; el remote se añadirá cuando el propietario facilite su URL.
+Versiona código, lockfiles, documentación y plantillas. Mantén privados `secrets/`, builds, capturas de red, `.dev.vars`, configuración local Wrangler y `.env.local`. Los binarios contienen el token SDK. Revisa archivos e historial antes de push. El repositorio conserva el historial incremental con tianrking como autor y committer.
 
 ## Licencia
 

@@ -2,6 +2,8 @@
 
 [English](README.md) · [Español](README.es.md) · [繁體中文](README.zh-TW.md)
 
+Repository: [tianrking/mori-muse-gadgets](https://github.com/tianrking/mori-muse-gadgets).
+
 Native **ESP-IDF 6.1** firmware for the **Spotpear ESP32-S3 1.8-inch round LCD V1**, a React browser chat client, and a Cloudflare Worker for Muse device traffic.
 
 Website and relay share one Worker. Current personal deployment: [muse.2fast.cfd](https://muse.2fast.cfd/). Self-hosting is supported. Reachability and latency depend on your network, Cloudflare and the official upstream; worldwide acceleration is not guaranteed.
@@ -185,7 +187,7 @@ Current web deployment: `mori-studio-v1.4`, version `3fd6e9ef-8f9f-4def-a262-a0c
 
 ## Publishing and attribution
 
-Commit source, lockfiles, templates and documentation. Keep `secrets/`, builds, packet captures, `.dev.vars`, local Wrangler settings and `.env.local` private. Firmware binaries contain the SDK token. Before pushing, inspect tracked files and history for actual credentials. The current repository has incremental local commits and no remote; add the owner's GitHub URL when provided.
+Commit source, lockfiles, templates and documentation. Keep `secrets/`, builds, packet captures, `.dev.vars`, local Wrangler settings and `.env.local` private. Firmware binaries contain the SDK token. Before pushing, inspect tracked files and history for actual credentials. The repository preserves incremental history and uses the tianrking GitHub identity for authors and committers.
 
 SDK-derived code retains Meta copyright and [Apache-2.0](LICENSE). Preserve upstream notices. The Jollybot avatar is not covered by the SDK Apache license; review upstream asset terms before distributing firmware/assets. Dependencies retain their own licenses; see [the preserved upstream guide](README.upstream.md). Muse service access and SDK tokens have separate [Gadget SDK Terms](https://gadgets.muse.ai/sdk-terms). The source license does not grant unrestricted service access or permission to share account credentials.
 
