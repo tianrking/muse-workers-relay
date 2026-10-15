@@ -4,6 +4,25 @@
 
 El producto principal es el **relay de Cloudflare Workers** para las API de cuenta de Muse y conexiones WebSocket cifradas con Noise. Mori Studio es un cliente React opcional, servido por el mismo Worker. Es un proyecto comunitario independiente de Meta.
 
+## Qué se despliega y para qué sirve
+
+Despliegas un único origen HTTPS/WSS configurable para clientes Muse autorizados. El Worker reenvía tanto las API de cuenta como el transporte cifrado de la VM a los servicios oficiales. Permite usar tu dominio y una ruta de red alternativa; cualquier mejora de latencia o disponibilidad debe medirse en la red real del cliente.
+
+**La opción predeterminada es solamente el Worker.** No necesitas React, ESP32, VPS, servidor Python, base de datos ni un PC encendido. La cuenta, la VM y la IA siguen en Muse. La página opcional es un cliente de prueba del protocolo.
+
+```mermaid
+flowchart LR
+  C[Cliente autorizado] -->|HTTPS / WSS Noise| W[Worker relay]
+  B[Demo web opcional] -->|Adaptador de navegador| W
+  W -->|REST| A[api.muse.ai]
+  W -->|WebSocket cifrado| V[hatch.metaaivm.com]
+```
+
+Guías detalladas: [arquitectura y secuencia](docs/ARCHITECTURE.md), [despliegue y diagnóstico](docs/DEPLOYMENT.md), [capturas y evidencia](docs/SCREENSHOTS.md). Estas guías técnicas están en inglés; también hay una [guía completa en chino simplificado](docs/GUIDE.zh-CN.md).
+
+Para usar el relay, configura **el host de cuenta y el de Noise**, añade la clave del relay y conserva las credenciales oficiales adecuadas. La API de cuenta devuelve un token de VM; después el cliente abre WebSocket, completa Noise, se registra y procesa las tramas de chat. No es una API pública que acepte texto mediante un POST a `/chat/stream`.
+
+
 ## Organización
 
 - `main`: relay independiente del hardware, pruebas y documentación.
@@ -66,6 +85,24 @@ En `relay/`: `pnpm test` y `pnpm exec wrangler deploy --dry-run --config wrangle
 Las pruebas reales anteriores en PC completaron consulta de cuenta, WebSocket 101, handshake Noise y respuestas de texto a través del relay. La rama de hardware conserva la conexión de Spotpear mediante un hotspot ordinario del usuario. El audio no está completamente validado. Esta reorganización no despliega cambios en producción.
 
 El cliente debe poder acceder a Cloudflare y Muse debe aceptar el tráfico saliente. No se garantiza la misma disponibilidad o latencia en todos los países. No se guardan credenciales ni se cachean respuestas de cuenta. Los ejemplos desactivan observabilidad; no incluyen cuotas por usuario. Revisa tu plan y los controles de acceso antes de compartir un servicio.
+
+## Despliegue desde el panel y comprobación
+
+También puedes crear un Worker en el panel de Cloudflare y pegar **todo** `relay/worker.template.mjs` en su editor. En Settings → Variables and Secrets añade `MUSE_RELAY_KEY` como Secret y guarda/despliega. Esto no sube el cliente React. Para un dominio propio, usa Settings → Domains & Routes → Add → Custom Domain en una zona activa tuya; Cloudflare configura DNS y certificado.
+
+Comprueba por separado: `/health` 200 → `/fetch_vms` 200 con credenciales propias → WebSocket 101 con token de VM → Noise y registro → respuesta a un mensaje nuevo. El relay sin assets no tiene página de inicio: un 401/404 en `/` es normal. Un 503 indica secreto ausente; un 401 puede ser clave del relay o autorización oficial; 426 indica falta de Upgrade y 502 fallo al conectar con el upstream.
+
+Quitar los assets no elimina las rutas de adaptador de navegador sin clave compartida. Origin no es autenticación privada; si quieres restringir todo el tráfico a invitados, necesitas una política de acceso compatible o desactivar esos adaptadores. Consulta los [límites de confianza](docs/ARCHITECTURE.md).
+
+## Demo opcional: capturas históricas
+
+![Diagnóstico de conexión a través del relay](studio/docs/connection-proof.png)
+
+Captura del 2026-10-15: muestra origen del relay, cuenta, Noise y registro conectados en ese momento. Los 2425 ms son una muestra, no un benchmark mundial.
+
+![Respuestas guardadas de una conversación independiente](studio/docs/studio-chat.png)
+
+La captura de chat muestra respuestas anteriores y continuación tras recargar, pero la esquina superior derecha indica **conexión fallida**. Es historial local conservado después de desconectarse; no demuestra conexión activa al capturar. [Inicio](studio/docs/studio-home.png) y [guía Linux](studio/docs/linux-onboarding.png) solo muestran la interfaz. Consulta [evidencia y límites](docs/SCREENSHOTS.md).
 
 ## Licencia
 

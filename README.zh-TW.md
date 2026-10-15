@@ -4,6 +4,25 @@
 
 本專案的核心是 **Cloudflare Workers 中轉服務**，負責轉送 Muse 帳號 API 和 Noise 加密 WebSocket。Mori Studio 是可選的 React 網頁客戶端，可由同一個 Worker 提供。本專案為社群獨立實作，非 Meta 官方服務。
 
+## 部署什麼、解決什麼
+
+部署的是一個可設定的 HTTPS/WSS 入口，讓已授權的 Muse 客戶端把帳號請求與加密 VM 連線都交給自己的網域轉送。它提供另一條網路路徑；是否更快、能否直連，必須在實際客戶端網路量測。
+
+**預設只部署 Worker。** 不需要 React 建置、ESP32、VPS、Python 伺服器、資料庫或長期開機的電腦。AI、帳號授權和 VM 仍由官方提供；網頁是可選的協定測試客戶端。
+
+```mermaid
+flowchart LR
+  C[已授權客戶端] -->|HTTPS / WSS Noise| W[Worker 中轉]
+  B[可選網頁測試端] -->|瀏覽器適配| W
+  W -->|REST| A[api.muse.ai]
+  W -->|加密 WebSocket| V[hatch.metaaivm.com]
+```
+
+詳細文件：[架構與時序圖（英文）](docs/ARCHITECTURE.md)、[逐步部署與排障（英文）](docs/DEPLOYMENT.md)、[截圖及證據說明（英文）](docs/SCREENSHOTS.md)、[簡體中文完整指南](docs/GUIDE.zh-CN.md)。
+
+客戶端必須同時設定帳號與 Noise 入口、加入中轉金鑰並保留正確的官方憑證。先查詢帳號取得 VM Token，再完成 WS、Noise 與註冊，最後在加密串流內傳送聊天協定。Worker 的公開 REST 路由不包含普通 `/chat/stream` 聊天接口。
+
+
 ## 專案結構
 
 | 分支／目錄 | 用途 |
@@ -72,6 +91,24 @@ PowerShell 可用 `Copy-Item wrangler.example.jsonc wrangler.local.jsonc`。部�
 先前 PC 實測已完成中轉帳號查詢、WebSocket 101、Noise 握手與文字回覆。硬體分支保留 Spotpear 經使用者一般手機熱點連上中轉的紀錄。語音尚未完整驗收；本次分支整理不變更線上部署或韌體。
 
 中轉仍需裝置可達 Cloudflare，且官方上游接受 Cloudflare 出口。不能保證全球所有網路可達或延遲一致。Worker 不儲存帳號憑證、不快取帳號回應，部署範本關閉觀測日誌；目前沒有內建按使用者配額管理，分享服務前應依自己的方案設定存取控制。
+
+## 控制台部署與成功判斷
+
+也可直接在 Cloudflare 建立 Worker，將 `relay/worker.template.mjs` 全文貼進編輯器。到 Settings → Variables and Secrets 新增 Secret 類型的 `MUSE_RELAY_KEY`，保存部署。這只部署中轉，不會上傳 React。自訂網域使用 Settings → Domains & Routes → Add → Custom Domain，選自己的活躍 Cloudflare 區域，Cloudflare 處理 DNS 與憑證。
+
+逐層檢查：`/health` 200 → 自己的憑證查詢 `/fetch_vms` 200 → VM Token 完成 WS 101 → Noise／註冊成功 → 新測試句收到回覆。純中轉沒有首頁，`/` 返回 401／404 是正常的。503 查 Secret，401 區分中轉金鑰與官方授權，426 查 Upgrade，502 查 Worker 到上游的連線。
+
+移除靜態 assets 不會移除免共享金鑰的瀏覽器適配路由；Origin 不是私人 API 身分驗證。若要限定所有流量僅供受邀客戶端使用，需額外相容的存取策略或停用那些適配入口，詳見 [信任邊界](docs/ARCHITECTURE.md)。
+
+## 可選網頁：歷史截圖
+
+![中轉連線診斷](studio/docs/connection-proof.png)
+
+2026-10-15 留存：顯示中轉網域、帳號驗證、Noise 與註冊在當時成功。2425 ms 是單次握手樣本，並非全球加速指標。
+
+![獨立會話歷史回覆](studio/docs/studio-chat.png)
+
+聊天圖展示獨立會話與重新整理後續聊的歷史回覆，但右上角實際為**連線失敗**。它是斷線後保留的本機記錄，不能證明截圖時在線。[首頁圖](studio/docs/studio-home.png) 與 [Linux 引導圖](studio/docs/linux-onboarding.png) 僅展示介面。完整解釋見 [截圖與驗證範圍](docs/SCREENSHOTS.md)。
 
 ## 授權與來源
 

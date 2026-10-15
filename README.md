@@ -4,6 +4,20 @@
 
 A Cloudflare Workers relay for authenticated Muse account APIs and encrypted Noise WebSocket connections. **The Worker is the core product.** Mori Studio is an optional React browser client served by the same Worker. This is an independent community project, not an official Meta service.
 
+## What you deploy and why
+
+Deploy one configurable HTTPS/WSS origin for authorized Muse gadgets and custom clients. The relay forwards the account API and the encrypted VM transport to the official services, so both paths can use your own domain. It can offer an alternative network route; any speed or reachability improvement must be measured on the client's actual network.
+
+**Default deployment: just the Worker.** No React build, ESP32, VPS, Python server, database or always-on PC is required. The AI, account authorization and VM still run at Muse. The optional webpage is a protocol-aware test client, not the relay backend.
+
+| Read next | Contents |
+| --- | --- |
+| [Architecture](docs/ARCHITECTURE.md) | Component and sequence diagrams, credentials, transparency and trust boundaries |
+| [Deployment guide](docs/DEPLOYMENT.md) | CLI or dashboard deployment, domains, client configuration and layered troubleshooting |
+| [Screenshots and evidence](docs/SCREENSHOTS.md) | What saved browser screenshots and PC results actually prove |
+| [简体中文完整指南](docs/GUIDE.zh-CN.md) | 用途、架构、两种部署方式、客户端配置及验收 |
+
+
 ## Repository scope
 
 | Branch / directory | Purpose |
@@ -25,7 +39,7 @@ Gadget or browser → your Cloudflare Worker → official Muse account / VM serv
 
 The Worker forwards only fixed official destinations. Account requests retain their request body and upstream HTTP status. A successful Noise WebSocket upgrade is passed through; the Worker does not interpret chat, voice or encrypted application frames.
 
-The shared relay key controls access to native/custom relay routes. Every caller still supplies their own valid Muse credential. Browser routes adapt WebSocket authentication to browser APIs and enforce an Origin allowlist. Cloudflare terminates outer TLS and can see authorization headers; it does not receive Noise session keys.
+The shared relay key controls access to native/custom relay routes. Removing Studio assets does not disable the keyless browser adapters: Origin checks are not private-service authentication. A fully private deployment needs a compatible deployment-wide policy or disabled adapters; see [trust boundaries](docs/ARCHITECTURE.md#native-routes-and-browser-adapters). Every caller still supplies their own valid Muse credential. Browser routes adapt WebSocket authentication to browser APIs and enforce an Origin allowlist. Cloudflare terminates outer TLS and can see authorization headers; it does not receive Noise session keys.
 
 ## Deploy the relay only
 
@@ -43,23 +57,6 @@ pnpm exec wrangler secret put MUSE_RELAY_KEY --config wrangler.local.jsonc
 In PowerShell, use `Copy-Item wrangler.example.jsonc wrangler.local.jsonc` instead of `cp`. Edit the copied config to choose your Worker name. Enter your own randomly generated relay key at the secret prompt, and configure the same key in native/custom clients. The initial deployment returns 503 until the secret is configured. Local configuration and `.dev.vars` are ignored by Git.
 
 Verify `https://<your-worker>/health`. This checks configuration and reachability, not account authorization or a successful chat session. Add a custom domain in Cloudflare if desired; the workers.dev address also works where reachable.
-
-## Optional: serve Mori Studio on the same Worker
-
-```sh
-cd studio
-pnpm install --frozen-lockfile
-pnpm build
-cd ../relay
-pnpm install --frozen-lockfile
-cp wrangler.web.example.jsonc wrangler.local.jsonc
-pnpm exec wrangler deploy --config wrangler.local.jsonc
-pnpm exec wrangler secret put MUSE_RELAY_KEY --config wrangler.local.jsonc
-```
-
-Run from the repository root. Choose your Worker name before deployment. The web config binds `studio/dist` as static assets. Same-origin browser routes need only the user's Muse credentials; the shared relay secret is never embedded in browser JavaScript. Add external frontend Origins to `BROWSER_ORIGINS` as an exact JSON string array; same-origin requests are accepted automatically. Origin checks are a browser access policy, not user authentication or a private-service boundary.
-
-The existing personal deployment is [muse.2fast.cfd](https://muse.2fast.cfd). Self-hosters use their own domain and secret. Studio supports multiple local account profiles, independent threads, explicit main-session selection, custom relay addresses, streaming Markdown and optional encrypted local credential storage. See [Studio documentation](studio/README.zh-CN.md).
 
 ## API contract
 
@@ -95,6 +92,35 @@ The current suite has 16 Worker contract tests and 9 Studio tests. Contract test
 Prior PC live tests completed account lookup, WebSocket 101, Noise handshake and text replies through the relay. The preserved hardware branch records a paired Spotpear connecting through this relay on the user's ordinary phone hotspot. Voice was not fully validated. The repository split does not change or redeploy the running service or firmware.
 
 A relay still needs a reachable client-to-Cloudflare path and upstream acceptance of Cloudflare traffic. It cannot guarantee connectivity or equal latency in every country/network. Requests are not cached, credentials are not persisted by the Worker, observability is disabled in example configs, and there is no built-in per-user quota service. Review your Cloudflare plan and add suitable access controls for your deployment.
+
+## Optional: serve Mori Studio on the same Worker
+
+```sh
+cd studio
+pnpm install --frozen-lockfile
+pnpm build
+cd ../relay
+pnpm install --frozen-lockfile
+cp wrangler.web.example.jsonc wrangler.local.jsonc
+pnpm exec wrangler deploy --config wrangler.local.jsonc
+pnpm exec wrangler secret put MUSE_RELAY_KEY --config wrangler.local.jsonc
+```
+
+Run from the repository root. Choose your Worker name before deployment. The web config binds `studio/dist` as static assets. Same-origin browser routes need only the user's Muse credentials; the shared relay secret is never embedded in browser JavaScript. Add external frontend Origins to `BROWSER_ORIGINS` as an exact JSON string array; same-origin requests are accepted automatically. Origin checks are a browser access policy, not user authentication or a private-service boundary.
+
+The existing personal deployment is [muse.2fast.cfd](https://muse.2fast.cfd). Self-hosters use their own domain and secret. Studio supports multiple local account profiles, independent threads, explicit main-session selection, custom relay addresses, streaming Markdown and optional encrypted local credential storage. See [Studio documentation](studio/README.zh-CN.md).
+
+## Optional demo screenshots — historical evidence
+
+The screenshots below show an optional client of the relay, captured on 2026-10-15. They are not new live tests.
+
+![Connected relay diagnostics](studio/docs/connection-proof.png)
+
+The diagnostics show the relay origin, account verification, Noise and client registration at capture time. The single handshake time is not an acceleration benchmark.
+
+![Recorded independent-thread replies](studio/docs/studio-chat.png)
+
+The chat image shows saved successful replies, including continuation after reload. Its top-right badge says connection failed: it proves retained conversation history, not an active connection at capture time. See the [evidence guide](docs/SCREENSHOTS.md) for the associated protocol records and limits. [Homepage layout](studio/docs/studio-home.png) and [Linux onboarding](studio/docs/linux-onboarding.png) are UI previews only.
 
 ## License and attribution
 
