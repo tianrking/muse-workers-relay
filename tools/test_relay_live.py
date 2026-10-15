@@ -5,6 +5,8 @@ from pathlib import Path
 import argparse
 ROOT = Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--relay-host',default='muse.w0x7ce.eu')
+parser.add_argument('--relay-key-file',type=Path,default=ROOT/'secrets/relay-key.txt')
 parser.add_argument('--mode',choices=['direct','relay','both'],default='both')
 parser.add_argument('--voice-output',action='store_true')
 parser.add_argument('--voice-note',action='store_true')
@@ -23,7 +25,7 @@ from musegadget.noise import Header
 from websockets.asyncio.client import connect
 logging.disable(logging.CRITICAL)
 creds=json.loads(args.credentials.read_text())
-relay_key=(ROOT/'secrets/relay-key.txt').read_text().strip()
+relay_key=args.relay_key_file.read_text().strip()
 results=[]
 def emit(stage, **fields):
     row={'stage':stage,**fields};results.append(row);print(json.dumps(row,ensure_ascii=False),flush=True)
@@ -43,7 +45,7 @@ def api(base, path, method='GET', body=None, token=None, relay=False):
     except ValueError:parsed={}
     return status,parsed,round((time.monotonic()-start)*1000)
 async def session_test(mode, vm):
-    relay=mode=='relay'; host='muse.w0x7ce.eu' if relay else creds.get('noise_host','hatch.metaaivm.com')
+    relay=mode=='relay'; host=args.relay_host if relay else creds.get('noise_host','hatch.metaaivm.com')
     metrics={}
     async def dial(url, headers):
         if relay:headers['X-Muse-Relay-Key']=relay_key
@@ -146,7 +148,7 @@ async def session_test(mode, vm):
         with contextlib.suppress(asyncio.CancelledError,Exception):await asyncio.wait_for(runner,8)
         if not runner.done():runner.cancel()
 async def main():
-    for mode,base in [('direct','https://api.muse.ai'),('relay','https://muse.w0x7ce.eu')]:
+    for mode,base in [('direct','https://api.muse.ai'),('relay','https://'+args.relay_host)]:
         if args.mode not in ('both',mode):continue
         try:
             status,data,ms=await asyncio.to_thread(api,base,'/fetch_vms',relay=mode=='relay')
@@ -162,6 +164,6 @@ async def main():
     reply_ok=all(rows.get(mode+'.chat',{}).get('reply_matched') for mode in modes)
     audio_ok=all(any(row['stage']==mode+'.tts' and row.get('status')==200 and row.get('bytes',0)>0 for row in results) for mode in modes)
     emit('summary',transport_ok=transport_ok,expected_text_reply_ok=reply_ok,tts_audio_verified=audio_ok)
-    args.report.write_text(json.dumps({'results':results},ensure_ascii=False,indent=2),encoding='utf8')
+    args.report.write_text(json.dumps({'relay_host':args.relay_host,'mode':args.mode,'results':results},ensure_ascii=False,indent=2),encoding='utf8')
     return bool(transport_ok and (reply_ok if not(args.voice_note or args.voice_note_file) else True) and (audio_ok if args.voice_output else True))
 raise SystemExit(0 if asyncio.run(main()) else 1)

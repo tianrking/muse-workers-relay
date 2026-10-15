@@ -6,7 +6,7 @@ export default {
   if (!RELAY_KEY) return new Response('Relay secret not configured',{status:503});
   const url = new URL(request.url);
   if (url.pathname === '/health' && request.method === 'GET')
-   return Response.json({service:'muse-personal-relay',version:1},{headers:{'Cache-Control':'no-store'}});
+   return Response.json({service:'muse-personal-relay',version:2,build:'2026-10-15'},{headers:{'Cache-Control':'no-store'}});
   if (request.headers.get('X-Muse-Relay-Key') !== RELAY_KEY)
    return new Response('Unauthorized',{status:401});
   let target;

@@ -1,0 +1,29 @@
+{
+  "relay_host": "muse.2fast.cfd",
+  "results": [
+    {
+      "path": "/fetch_vms",
+      "method": "GET",
+      "official_status": 401,
+      "relay_status": 401,
+      "same_body": true,
+      "same_content_type": true
+    },
+    {
+      "path": "/device_token/mint",
+      "method": "POST",
+      "official_status": 401,
+      "relay_status": 401,
+      "same_body": true,
+      "same_content_type": true
+    },
+    {
+      "path": "/device_token/refresh",
+      "method": "POST",
+      "official_status": 401,
+      "relay_status": 401,
+      "same_body": true,
+      "same_content_type": true
+    }
+  ]
+}
