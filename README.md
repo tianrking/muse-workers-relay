@@ -11,7 +11,7 @@ A Cloudflare Workers relay for authenticated Muse account APIs and encrypted Noi
 | `main` | Platform-independent Worker, contract tests, optional browser demo and documentation |
 | `relay/` | Deployable Worker source, configuration examples and tests |
 | `studio/` | Optional React + TypeScript chat client; no application server required |
-| [`test/esp32-spotpear`](https://github.com/tianrking/mori-muse-gadgets/tree/test/esp32-spotpear) | Complete ESP32 SDK snapshot, Spotpear V1 port, flashing tools and hardware test records |
+| [`test/esp32-spotpear`](https://github.com/tianrking/muse-workers-relay/tree/test/esp32-spotpear) | Complete ESP32 SDK snapshot, Spotpear V1 port, flashing tools and hardware test records |
 
 The ESP32 branch preserves the complete implementation at the split. It is a separate integration test target; firmware dependencies are not required to deploy the relay. Earlier firmware commits remain in shared Git history.
 

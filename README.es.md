@@ -9,7 +9,7 @@ El producto principal es el **relay de Cloudflare Workers** para las API de cuen
 - `main`: relay independiente del hardware, pruebas y documentación.
 - `relay/`: implementación, configuraciones de despliegue y pruebas de contrato.
 - `studio/`: aplicación React + TypeScript opcional, sin servidor de aplicación.
-- [`test/esp32-spotpear`](https://github.com/tianrking/mori-muse-gadgets/tree/test/esp32-spotpear): implementación completa de ESP32, adaptación Spotpear V1, herramientas y pruebas de hardware. Conserva el estado anterior a la separación. Los commits antiguos permanecen en el historial compartido.
+- [`test/esp32-spotpear`](https://github.com/tianrking/muse-workers-relay/tree/test/esp32-spotpear): implementación completa de ESP32, adaptación Spotpear V1, herramientas y pruebas de hardware. Conserva el estado anterior a la separación. Los commits antiguos permanecen en el historial compartido.
 
 ## Funcionamiento
 

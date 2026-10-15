@@ -11,7 +11,7 @@
 | `main` | 與硬體無關的中轉核心、測試及文件 |
 | `relay/` | Worker 原始碼、部署範本和協定測試 |
 | `studio/` | 可選 React + TypeScript 聊天頁，無需應用程式伺服器 |
-| [`test/esp32-spotpear`](https://github.com/tianrking/mori-muse-gadgets/tree/test/esp32-spotpear) | 分支拆分前的完整 ESP32 SDK、Spotpear V1 適配、燒錄工具與硬體紀錄 |
+| [`test/esp32-spotpear`](https://github.com/tianrking/muse-workers-relay/tree/test/esp32-spotpear) | 分支拆分前的完整 ESP32 SDK、Spotpear V1 適配、燒錄工具與硬體紀錄 |
 
 部署中轉不需要 ESP-IDF 或開發板。ESP32 作為獨立整合測試分支保留；先前的韌體提交仍在共用 Git 歷史中。
 
