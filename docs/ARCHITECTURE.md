@@ -82,4 +82,4 @@ Use one configurable origin for authorized Muse clients, centralize the account/
 
 There is no measured universal speedup claim. Extra hops can increase latency; the relay cannot repair a client network that cannot reach Cloudflare. Official availability, authorization and account limits remain in force.
 
-Implementation reference: [Worker source](../relay/worker.template.mjs), [API contract](../README.md#api-contract), [Cloudflare WebSocket runtime](https://developers.cloudflare.com/workers/runtime-apis/websockets/).
+Implementation reference: [Worker source](../relay/worker.template.mjs), [full wire contract](API.md), [Cloudflare WebSocket runtime](https://developers.cloudflare.com/workers/runtime-apis/websockets/).

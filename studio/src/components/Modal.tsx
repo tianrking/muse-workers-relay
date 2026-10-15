@@ -1,3 +1,5 @@
+import { useLanguage } from "../i18n/useLanguage";
+import { t } from "../i18n/runtime";
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 export function Modal({
@@ -13,6 +15,7 @@ export function Modal({
   onClose: () => void;
   wide?: boolean;
 }) {
+  useLanguage();
   const ref = useRef<HTMLDialogElement>(null),
     id = useId();
   useEffect(() => {
@@ -36,7 +39,11 @@ export function Modal({
           <h2 id={id}>{title}</h2>
           {subtitle && <p>{subtitle}</p>}
         </div>
-        <button className="icon-button" aria-label="关闭" onClick={onClose}>
+        <button
+          className="icon-button"
+          aria-label={t("关闭")}
+          onClick={onClose}
+        >
           <X size={19} />
         </button>
       </div>

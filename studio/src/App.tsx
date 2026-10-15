@@ -1,3 +1,5 @@
+import { t, setLanguage } from "./i18n/runtime";
+import { useLanguage } from "./i18n/useLanguage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
@@ -50,6 +52,7 @@ import { seal, unseal } from "./lib/vault";
 import { refreshCredentials } from "./lib/account-api";
 import type { Profile, Credentials, Conversation, Message } from "./types";
 export default function App() {
+  const language = useLanguage();
   const [profiles, setProfiles] = useState<Profile[]>(storedProfiles),
     [conversations, setConversations] =
       useState<Conversation[]>(storedConversations),
@@ -99,7 +102,7 @@ export default function App() {
     [conversations, activeId, archived, query],
   );
   function notify(text: string) {
-    setToast(text);
+    setToast(t(text));
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(""), 4500);
   }
@@ -107,21 +110,21 @@ export default function App() {
     try {
       save("profiles", profiles);
     } catch {
-      notify("账号配置无法保存，本机存储空间可能不足");
+      notify(t("账号配置无法保存，本机存储空间可能不足"));
     }
   }, [profiles]);
   useEffect(() => {
     try {
       save("conversations", conversations);
     } catch {
-      notify("聊天记录无法保存，请导出重要会话并释放本机空间");
+      notify(t("聊天记录无法保存，请导出重要会话并释放本机空间"));
     }
   }, [conversations]);
   useEffect(() => {
     try {
       save("activeProfile", activeId);
     } catch {
-      notify("浏览器未允许保存账号选择");
+      notify(t("浏览器未允许保存账号选择"));
     }
   }, [activeId]);
   useEffect(() => {
@@ -173,7 +176,7 @@ export default function App() {
       return;
     }
     if (conversations.length >= 150) {
-      notify("最多保存 150 个本机会话，请先导出记录");
+      notify(t("最多保存 150 个本机会话，请先导出记录"));
       return;
     }
     if (kind === "main") {
@@ -204,7 +207,7 @@ export default function App() {
     password: string,
   ) {
     if (!profiles.some((p) => p.id === profile.id) && profiles.length >= 30)
-      throw Error("本机最多保存 30 个账号");
+      throw Error(t("本机最多保存 30 个账号"));
     let next = profile;
     if (password)
       next = { ...profile, vault: await seal(credentials, password) };
@@ -224,8 +227,8 @@ export default function App() {
     setActiveId(profile.id);
     notify(
       credentials.access_token
-        ? "账号已保存，点击连接开始"
-        : "账号已保存，等待官方配对后补齐 device token",
+        ? t("账号已保存，点击连接开始")
+        : t("账号已保存，等待官方配对后补齐 device token"),
     );
   }
   async function connect(profile = active) {
@@ -239,16 +242,16 @@ export default function App() {
         return;
       }
       setEditor(profile);
-      notify("请先补齐该账号的 device access token");
+      notify(t("请先补齐该账号的 device access token"));
       return;
     }
     const start = performance.now();
     try {
       await engine.connect(profile, credentials);
       setConnectionMs(Math.round(performance.now() - start));
-      notify("已连接 " + profile.name);
+      notify(t("已连接 ") + profile.name);
     } catch (e) {
-      notify(e instanceof Error ? e.message : "连接失败");
+      notify(e instanceof Error ? e.message : t("连接失败"));
     }
   }
   function edit(profile: Profile) {
@@ -268,7 +271,7 @@ export default function App() {
       return;
     }
     if (!ready) {
-      notify("先连接当前账号，再发送消息");
+      notify(t("先连接当前账号，再发送消息"));
       return;
     }
     let target = conversation;
@@ -278,7 +281,7 @@ export default function App() {
       setConversationId(target.id);
     }
     if (target.messages.length >= 300) {
-      notify("当前会话已达 300 条本地消息，请新建会话");
+      notify(t("当前会话已达 300 条本地消息，请新建会话"));
       return;
     }
     const id = target.id,
@@ -333,7 +336,7 @@ export default function App() {
             m.status === "streaming" ? { ...m, status: "stopped" } : m,
           ),
         }));
-        notify("已停止本次接收，云端任务可能继续");
+        notify(t("已停止本次接收，云端任务可能继续"));
       } else
         updateConversation(id, (row) => ({
           ...row,
@@ -342,7 +345,7 @@ export default function App() {
             {
               id: newId(),
               role: "error",
-              text: error.message || "暂时无法获得回复，请检查连接后重试",
+              text: error.message || t("暂时无法获得回复，请检查连接后重试"),
               createdAt: Date.now(),
               status: "done",
             },
@@ -361,7 +364,7 @@ export default function App() {
     a.download = conversation.title.replace(/[<>:"/\\|?*]/g, "_") + ".md";
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    notify("已导出当前会话");
+    notify(t("已导出当前会话"));
   }
   const Icon = active?.mode === "relay" ? Radio : Cloud;
   return (
@@ -377,7 +380,7 @@ export default function App() {
           <button
             className="icon-button mobile-close"
             onClick={() => setMobile(false)}
-            aria-label="关闭侧栏"
+            aria-label={t("关闭侧栏")}
           >
             <X size={18} />
           </button>
@@ -388,30 +391,31 @@ export default function App() {
           disabled={busy}
         >
           <Plus size={17} />
-          新建独立会话<span>＋</span>
+          {t("新建独立会话")}
+          <span>＋</span>
         </button>
         <div className="search-box">
           <Search size={15} />
           <input
             ref={search}
-            aria-label="搜索会话"
-            placeholder="搜索会话"
+            aria-label={t("搜索会话")}
+            placeholder={t("搜索会话")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
           <kbd>⌘ K</kbd>
         </div>
         <div className="section-label">
-          <span>{archived ? "已归档" : "你的会话"}</span>
+          <span>{archived ? t("已归档") : t("你的会话")}</span>
           <button
             className="icon-button"
             onClick={() => setArchived(!archived)}
-            aria-label={archived ? "查看活跃会话" : "查看归档"}
+            aria-label={archived ? t("查看活跃会话") : t("查看归档")}
           >
             {archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
           </button>
         </div>
-        <nav className="conversation-list" aria-label="会话列表">
+        <nav className="conversation-list" aria-label={t("会话列表")}>
           {list.map((row) => (
             <div
               key={row.id}
@@ -434,7 +438,7 @@ export default function App() {
               <button
                 className="archive-button"
                 disabled={busy}
-                aria-label={row.archived ? "恢复会话" : "归档会话"}
+                aria-label={row.archived ? t("恢复会话") : t("归档会话")}
                 onClick={() => {
                   updateConversation(row.id, (c) => ({
                     ...c,
@@ -442,7 +446,9 @@ export default function App() {
                   }));
                   if (row.id === conversationId) setConversationId("");
                   notify(
-                    row.archived ? "会话已恢复" : "仅在本机归档，官方记录保留",
+                    row.archived
+                      ? t("会话已恢复")
+                      : t("仅在本机归档，官方记录保留"),
                   );
                 }}
               >
@@ -457,19 +463,19 @@ export default function App() {
           {!list.length && (
             <div className="empty-list">
               {query
-                ? "没有找到匹配的会话"
+                ? t("没有找到匹配的会话")
                 : archived
-                  ? "还没有归档会话"
-                  : "让第一个想法从这里开始。"}
+                  ? t("还没有归档会话")
+                  : t("让第一个想法从这里开始。")}
             </div>
           )}
         </nav>
         <div className="sidebar-note">
           <span className="note-icon">✳</span>
           <p>
-            给想法一点空间。
+            {t("给想法一点空间。")}
             <br />
-            给自己一点时间。
+            {t("给自己一点时间。")}
           </p>
           <small>YOUR PERSONAL MUSE SPACE</small>
         </div>
@@ -479,12 +485,12 @@ export default function App() {
               {active?.name.slice(0, 1) || "M"}
             </div>
             <select
-              aria-label="当前账号"
+              aria-label={t("当前账号")}
               value={activeId}
               disabled={busy || connecting}
               onChange={(e) => selectAccount(e.target.value)}
             >
-              <option value="">选择账号</option>
+              <option value="">{t("选择账号")}</option>
               {profiles
                 .filter((p) => !p.disabled)
                 .map((p) => (
@@ -498,12 +504,12 @@ export default function App() {
           <div className="footer-actions">
             <button onClick={() => setManage(true)}>
               <Settings2 size={14} />
-              账号与设置
+              {t("账号与设置")}
             </button>
             <button
               className="icon-button"
               onClick={() => setDark(!dark)}
-              aria-label="切换主题"
+              aria-label={t("切换主题")}
             >
               <Sun size={16} />
             </button>
@@ -516,36 +522,50 @@ export default function App() {
             <button
               className="icon-button mobile-menu"
               onClick={() => setMobile(true)}
-              aria-label="打开侧栏"
+              aria-label={t("打开侧栏")}
             >
               <Menu size={20} />
             </button>
-            <span>工作空间</span>
+            <span>{t("工作空间")}</span>
+
             <ChevronRight size={13} />
-            <strong>{active?.name || "欢迎来到 Mori"}</strong>
+            <strong>{active?.name || t("欢迎来到 Mori")}</strong>
             <span className="beta">PERSONAL</span>
           </div>
           <div className="top-actions">
+            <label className="language-control">
+              <span className="sr-only">Language / 语言</span>
+              <select
+                aria-label="Language / 语言"
+                value={language}
+                onChange={(event) =>
+                  setLanguage(event.target.value as "en" | "zh-CN")
+                }
+              >
+                <option value="en">English</option>
+                <option value="zh-CN">简体中文</option>
+              </select>
+            </label>
             <button
               className={"connection-status " + engine.phase}
               onClick={() => setDiagnostics(true)}
             >
               <i />
               {engine.phase === "sending"
-                ? "正在回复"
+                ? t("正在回复")
                 : engine.phase === "ready"
-                  ? "已连接"
+                  ? t("已连接")
                   : engine.phase === "connecting"
-                    ? "连接中"
+                    ? t("连接中")
                     : engine.phase === "error"
-                      ? "连接失败"
-                      : "未连接"}
+                      ? t("连接失败")
+                      : t("未连接")}
               <ChevronDown size={12} />
             </button>
             <button
               className="icon-button"
               onClick={() => setEditor(active || "new")}
-              aria-label="连接设置"
+              aria-label={t("连接设置")}
             >
               <SlidersHorizontal size={18} />
             </button>
@@ -553,7 +573,7 @@ export default function App() {
         </header>
         {!network && (
           <div className="network-banner" role="alert">
-            网络已离线。恢复网络后重新连接即可继续。
+            {t("网络已离线。恢复网络后重新连接即可继续。")}
           </div>
         )}
         <div className="chat-heading">
@@ -566,7 +586,7 @@ export default function App() {
                     autoFocus
                     value={titleDraft}
                     maxLength={60}
-                    aria-label="会话名称"
+                    aria-label={t("会话名称")}
                     onChange={(e) => setTitleDraft(e.target.value)}
                     onBlur={() => {
                       if (titleDraft.trim())
@@ -587,7 +607,7 @@ export default function App() {
                     <button
                       className="icon-button"
                       disabled={busy}
-                      aria-label="重命名会话"
+                      aria-label={t("重命名会话")}
                       onClick={() => {
                         setTitleDraft(conversation.title);
                         setRenaming(true);
@@ -605,10 +625,10 @@ export default function App() {
                 >
                   <Layers size={12} />
                   {conversation.kind === "main"
-                    ? "主会话 · 写入 Muse main"
+                    ? t("主会话 · 写入 Muse main")
                     : conversation.verified
-                      ? "独立会话 · 官方已确认"
-                      : "独立会话 · 首条消息时创建"}
+                      ? t("独立会话 · 官方已确认")
+                      : t("独立会话 · 首条消息时创建")}
                 </span>
               </>
             ) : (
@@ -622,7 +642,7 @@ export default function App() {
               <button
                 className="icon-button"
                 onClick={exportChat}
-                aria-label="导出会话"
+                aria-label={t("导出会话")}
               >
                 <ArrowDownToLine size={17} />
               </button>
@@ -633,7 +653,7 @@ export default function App() {
               onClick={() => create("main")}
             >
               <MessageCircle size={14} />
-              进入主会话
+              {t("进入主会话")}
             </button>
           </div>
         </div>
@@ -656,34 +676,35 @@ export default function App() {
                   <Sparkles size={15} />
                 </span>
               </div>
-              <div className="hello-label">你的 Muse，你的节奏。</div>
+              <div className="hello-label">{t("你的 Muse，你的节奏。")}</div>
               <h2>
-                把想法，聊成<span>下一步。</span>
+                {t("把想法，聊成")}
+                <span>{t("下一步。")}</span>
               </h2>
               <p>
-                整理灵感、探索问题，或者只是聊聊今天。
+                {t("整理灵感、探索问题，或者只是聊聊今天。")}
                 <br />
-                为每一个新想法，留一间独立的小房间。
+                {t("为每一个新想法，留一间独立的小房间。")}
               </p>
               <div className="prompt-grid">
                 {[
                   {
                     icon: Sparkles,
-                    title: "灵感发芽",
-                    text: "帮我把一个模糊的想法变成可执行的计划。",
-                    hint: "让一个想法有新的可能",
+                    title: t("灵感发芽"),
+                    text: t("帮我把一个模糊的想法变成可执行的计划。"),
+                    hint: t("让一个想法有新的可能"),
                   },
                   {
                     icon: Layers,
-                    title: "理清思路",
-                    text: "带我一步步梳理今天最重要的三件事。",
-                    hint: "从纷乱中找到下一步",
+                    title: t("理清思路"),
+                    text: t("带我一步步梳理今天最重要的三件事。"),
+                    hint: t("从纷乱中找到下一步"),
                   },
                   {
                     icon: Sun,
-                    title: "轻松聊聊",
-                    text: "给我推荐一个今天就能做的小冒险。",
-                    hint: "让今天多一点小惊喜",
+                    title: t("轻松聊聊"),
+                    text: t("给我推荐一个今天就能做的小冒险。"),
+                    hint: t("让今天多一点小惊喜"),
                   },
                 ].map(({ icon: PromptIcon, title, text, hint }) => (
                   <button
@@ -710,14 +731,18 @@ export default function App() {
                 <span>
                   <Link2 size={14} />
                   {active
-                    ? "连接 " + active.name + "，开始你的对话"
-                    : "添加自己的 Muse 账号，开始使用"}
+                    ? t("连接 ") + active.name + t("，开始你的对话")
+                    : t("添加自己的 Muse 账号，开始使用")}
                 </span>
                 <button
                   disabled={connecting}
                   onClick={() => (active ? void connect() : setEditor("new"))}
                 >
-                  {connecting ? "正在连接…" : active ? "连接账号" : "添加账号"}
+                  {connecting
+                    ? t("正在连接…")
+                    : active
+                      ? t("连接账号")
+                      : t("添加账号")}
                   <ArrowRight size={14} />
                 </button>
               </div>
@@ -731,7 +756,7 @@ export default function App() {
             >
               <textarea
                 ref={composer}
-                aria-label="消息"
+                aria-label={t("消息")}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => {
@@ -744,24 +769,26 @@ export default function App() {
                     void send();
                   }
                 }}
-                placeholder="写下你的想法…"
+                placeholder={t("写下你的想法…")}
                 maxLength={2000}
                 rows={2}
               />
               <div className="composer-toolbar">
                 <span>
                   <Layers size={13} />
-                  {conversation?.kind === "main" ? "Muse 主会话" : "独立会话"}
+                  {conversation?.kind === "main"
+                    ? t("Muse 主会话")
+                    : t("独立会话")}
                   <span className="toolbar-dot">·</span>
-                  {active?.name || "尚未选择账号"}
+                  {active?.name || t("尚未选择账号")}
                 </span>
                 {busy ? (
                   <button
                     className="send-button stop"
                     type="button"
                     onClick={engine.cancel}
-                    aria-label="停止接收"
-                    title="停止接收；云端任务可能继续"
+                    aria-label={t("停止接收")}
+                    title={t("停止接收；云端任务可能继续")}
                   >
                     <Square size={14} />
                   </button>
@@ -770,7 +797,7 @@ export default function App() {
                     className="send-button"
                     type="submit"
                     disabled={!draft.trim() || !ready || connecting}
-                    aria-label="发送消息"
+                    aria-label={t("发送消息")}
                   >
                     <ArrowUp size={19} />
                   </button>
@@ -780,12 +807,12 @@ export default function App() {
             <div className="composer-caption">
               <span>
                 <ShieldCheck size={11} />
-                Noise 加密传输 · 本机保存会话
+                {t("Noise 加密传输 · 本机保存会话")}
               </span>
               <span>
                 {draft.length > 1800
                   ? draft.length + "/2000"
-                  : "Enter 发送 · Shift + Enter 换行"}
+                  : t("Enter 发送 · Shift + Enter 换行")}
               </span>
             </div>
           </div>
@@ -796,7 +823,7 @@ export default function App() {
           </span>
           <button onClick={() => setDiagnostics(true)}>
             <Icon size={12} />
-            {active?.mode === "relay" ? "自定义中转" : "默认中转"}
+            {active?.mode === "relay" ? t("自定义中转") : t("默认中转")}
             <span>↗</span>
           </button>
         </footer>
@@ -813,8 +840,8 @@ export default function App() {
       )}
       {manage && (
         <Modal
-          title="账号与工作空间"
-          subtitle="不同账号分别保存配置与会话，凭证不会混用。"
+          title={t("账号与工作空间")}
+          subtitle={t("不同账号分别保存配置与会话，凭证不会混用。")}
           onClose={() => setManage(false)}
         >
           <div className="account-manager">
@@ -824,36 +851,38 @@ export default function App() {
                 <div>
                   <strong>
                     {profile.name}
-                    {profile.disabled ? " · 已停用" : ""}
+                    {profile.disabled ? t(" · 已停用") : ""}
                   </strong>
                   <small>
-                    {profile.mode === "official" ? "默认中转" : profile.server}{" "}
+                    {profile.mode === "official"
+                      ? t("默认中转")
+                      : profile.server}{" "}
                     ·{" "}
                     {secrets.current.get(profile.id)?.access_token
-                      ? "已授权"
+                      ? t("已授权")
                       : profile.vault
-                        ? "已加密锁定"
-                        : "待官方配对"}
+                        ? t("已加密锁定")
+                        : t("待官方配对")}
                   </small>
                 </div>
                 <button
                   className="icon-button"
                   onClick={() => edit(profile)}
-                  aria-label={"编辑 " + profile.name}
+                  aria-label={t("编辑 ") + profile.name}
                 >
                   <Pencil size={15} />
                 </button>
                 <button
                   className="icon-button"
-                  aria-label={"锁定 " + profile.name}
+                  aria-label={t("锁定 ") + profile.name}
                   onClick={() => {
                     if (engine.accountId === profile.id) engine.disconnect();
                     secrets.current.delete(profile.id);
                     setSecretVersion((n) => n + 1);
                     notify(
                       profile.vault
-                        ? "已锁定本机凭证"
-                        : "已清除内存凭证，重新使用需要导入",
+                        ? t("已锁定本机凭证")
+                        : t("已清除内存凭证，重新使用需要导入"),
                     );
                   }}
                 >
@@ -862,7 +891,7 @@ export default function App() {
                 <button
                   className="icon-button"
                   aria-label={
-                    (profile.disabled ? "恢复 " : "停用 ") + profile.name
+                    (profile.disabled ? t("恢复 ") : t("停用 ")) + profile.name
                   }
                   onClick={() => {
                     if (engine.accountId === profile.id) engine.disconnect();
@@ -877,8 +906,8 @@ export default function App() {
                     if (activeId === profile.id) setActiveId("");
                     notify(
                       profile.disabled
-                        ? "账号已恢复"
-                        : "账号已停用，配置与会话保留",
+                        ? t("账号已恢复")
+                        : t("账号已停用，配置与会话保留"),
                     );
                   }}
                 >
@@ -890,7 +919,7 @@ export default function App() {
                 </button>
                 <button
                   className="icon-button"
-                  aria-label={"刷新 " + profile.name}
+                  aria-label={t("刷新 ") + profile.name}
                   disabled={!secrets.current.get(profile.id)?.refresh_token}
                   onClick={() => {
                     setManage(false);
@@ -904,7 +933,7 @@ export default function App() {
             {!profiles.length && (
               <div className="empty-account">
                 <KeyRound size={28} />
-                <p>还没有账号，添加自己的 Muse 凭证。</p>
+                <p>{t("还没有账号，添加自己的 Muse 凭证。")}</p>
               </div>
             )}
             <button
@@ -915,12 +944,14 @@ export default function App() {
               }}
             >
               <Plus size={16} />
-              添加另一个账号
+              {t("添加另一个账号")}
             </button>
             <div className="info-card">
               <Info size={17} />
               <p>
-                账号名称、连接配置和会话保存在当前浏览器。未加密保存的凭证在关闭或刷新页面后清除。
+                {t(
+                  "账号名称、连接配置和会话保存在当前浏览器。未加密保存的凭证在关闭或刷新页面后清除。",
+                )}
               </p>
             </div>
             <button
@@ -930,15 +961,15 @@ export default function App() {
                 setDiagnostics(true);
               }}
             >
-              查看当前连接与诊断
+              {t("查看当前连接与诊断")}
             </button>
           </div>
         </Modal>
       )}
       {unlock && (
         <Modal
-          title={"解锁 " + unlock.name}
-          subtitle="密码只在本机用于解密，不会发送到服务器。"
+          title={t("解锁 ") + unlock.name}
+          subtitle={t("密码只在本机用于解密，不会发送到服务器。")}
           onClose={() => setUnlock(null)}
         >
           <form
@@ -956,13 +987,13 @@ export default function App() {
                 await connect(profile);
               } catch (error) {
                 setUnlockError(
-                  error instanceof Error ? error.message : "解锁失败",
+                  error instanceof Error ? error.message : t("解锁失败"),
                 );
               }
             }}
           >
             <label>
-              本机解锁密码
+              {t("本机解锁密码")}
               <input
                 autoFocus
                 type="password"
@@ -973,42 +1004,42 @@ export default function App() {
             </label>
             {unlockError && (
               <p className="form-error" role="alert">
-                {unlockError}
+                {t(unlockError)}
               </p>
             )}
-            <button className="primary full-width">解锁并连接</button>
+            <button className="primary full-width">{t("解锁并连接")}</button>
           </form>
         </Modal>
       )}
       {diagnostics && (
         <Modal
-          title="连接与诊断"
-          subtitle="查看实际连接路线，诊断信息不包含 token 或聊天内容。"
+          title={t("连接与诊断")}
+          subtitle={t("查看实际连接路线，诊断信息不包含 token 或聊天内容。")}
           onClose={() => setDiagnostics(false)}
         >
           <div className="panel-body">
             <div className="route-visual">
-              <span>浏览器</span>
+              <span>{t("浏览器")}</span>
               <ChevronRight size={15} />
               <span>
                 {active?.mode === "relay"
-                  ? "自定义 Relay"
-                  : "本站默认中转 · 免填中转 Token"}
+                  ? t("自定义 Relay")
+                  : t("本站默认中转 · 免填中转 Token")}
               </span>
               <ChevronRight size={15} />
-              <span>Muse 官方</span>
+              <span>{t("Muse 官方")}</span>
             </div>
             <dl className="diagnostic-list">
               <div>
-                <dt>当前状态</dt>
-                <dd>{engine.label}</dd>
+                <dt>{t("当前状态")}</dt>
+                <dd>{t(engine.label)}</dd>
               </div>
               <div>
-                <dt>账号</dt>
-                <dd>{active?.name || "未选择"}</dd>
+                <dt>{t("账号")}</dt>
+                <dd>{active?.name || t("未选择")}</dd>
               </div>
               <div>
-                <dt>连接入口</dt>
+                <dt>{t("连接入口")}</dt>
                 <dd>
                   {active?.mode === "relay" ? active.server : location.origin}
                 </dd>
@@ -1016,35 +1047,35 @@ export default function App() {
               {conversation && (
                 <>
                   <div>
-                    <dt>会话类型</dt>
+                    <dt>{t("会话类型")}</dt>
                     <dd>
                       {conversation.kind === "thread"
-                        ? "独立线程"
+                        ? t("独立线程")
                         : "Muse main"}
                     </dd>
                   </div>
                   <div>
-                    <dt>会话 ID</dt>
+                    <dt>{t("会话 ID")}</dt>
                     <dd>{conversation.sessionId || "main"}</dd>
                   </div>
                 </>
               )}
               <div>
-                <dt>官方 API</dt>
+                <dt>{t("官方 API")}</dt>
                 <dd>api.muse.ai</dd>
               </div>
               <div>
-                <dt>握手耗时</dt>
-                <dd>{connectionMs ? connectionMs + " ms" : "尚未测量"}</dd>
+                <dt>{t("握手耗时")}</dt>
+                <dd>{connectionMs ? connectionMs + " ms" : t("尚未测量")}</dd>
               </div>
               <div>
-                <dt>可用 Muse</dt>
+                <dt>{t("可用 Muse")}</dt>
                 <dd>{engine.vms.length}</dd>
               </div>
             </dl>
             {engine.vms.length > 1 && active && (
               <label>
-                选择 Muse
+                {t("选择 Muse")}
                 <select
                   value={
                     active.vmId ||
@@ -1059,7 +1090,7 @@ export default function App() {
                       ),
                     );
                     engine.disconnect();
-                    notify("Muse 已切换，请重新连接");
+                    notify(t("Muse 已切换，请重新连接"));
                   }}
                 >
                   {engine.vms.map((vm) => (
@@ -1076,21 +1107,21 @@ export default function App() {
                   <Check size={13} />
                   <span>
                     {row.stage === "reconnect"
-                      ? "自动重连"
+                      ? t("自动重连")
                       : row.stage === "account"
-                        ? "账号验证"
+                        ? t("账号验证")
                         : row.stage === "registered"
-                          ? "Noise 握手与设备注册"
+                          ? t("Noise 握手与设备注册")
                           : row.stage === "chat_ack"
-                            ? "消息确认"
-                            : "订阅状态"}
+                            ? t("消息确认")
+                            : t("订阅状态")}
                   </span>
                   <code>
                     {row.status ||
                       (row.isThread
-                        ? "独立会话"
+                        ? t("独立会话")
                         : row.noise
-                          ? "已加密"
+                          ? t("已加密")
                           : row.vmCount || "OK")}
                   </code>
                 </div>
@@ -1099,8 +1130,9 @@ export default function App() {
             <div className="info-card">
               <Globe size={17} />
               <p>
-                官方模式仍经过本网站的浏览器适配入口。自定义中转必须支持 Muse
-                浏览器协议和允许本站 Origin，不能填入任意 HTTP 代理。
+                {t(
+                  "官方模式仍经过本网站的浏览器适配入口。自定义中转必须支持 Muse 浏览器协议和允许本站 Origin，不能填入任意 HTTP 代理。",
+                )}
               </p>
             </div>
             <div className="button-row">
@@ -1111,7 +1143,7 @@ export default function App() {
                   setDiagnostics(false);
                 }}
               >
-                断开连接
+                {t("断开连接")}
               </button>
               <button
                 className="primary"
@@ -1121,7 +1153,7 @@ export default function App() {
                   void connect();
                 }}
               >
-                重新连接
+                {t("重新连接")}
               </button>
             </div>
           </div>
@@ -1129,20 +1161,23 @@ export default function App() {
       )}
       {refresh && (
         <Modal
-          title="手动刷新设备凭证"
-          subtitle="仅对你独立用于网页的设备凭证执行。"
+          title={t("手动刷新设备凭证")}
+          subtitle={t("仅对你独立用于网页的设备凭证执行。")}
           onClose={() => !refreshing && setRefresh(null)}
         >
           <div className="panel-body">
             <div className="info-card">
               <Info size={18} />
               <p>
-                官方刷新可能轮换 refresh token。若此凭证还被 MCU
-                使用，刷新后需同步更新设备。本操作不会自动修改板子，也不会自动重试。
+                {t(
+                  "官方刷新可能轮换 refresh token。若此凭证还被 MCU 使用，刷新后需同步更新设备。本操作不会自动修改板子，也不会自动重试。",
+                )}
               </p>
             </div>
             <p className="field-help">
-              刷新后的凭证会更新到当前页面内存；若账号有加密存储，请在编辑账号中重新输入本机密码保存。
+              {t(
+                "刷新后的凭证会更新到当前页面内存；若账号有加密存储，请在编辑账号中重新输入本机密码保存。",
+              )}
             </p>
             <div className="button-row">
               <button
@@ -1150,7 +1185,7 @@ export default function App() {
                 onClick={() => setRefresh(null)}
                 disabled={refreshing}
               >
-                取消
+                {t("取消")}
               </button>
               <button
                 className="primary"
@@ -1171,15 +1206,15 @@ export default function App() {
                       ),
                     );
                     setRefresh(null);
-                    notify("凭证已更新到内存，请重新连接并保存");
+                    notify(t("凭证已更新到内存，请重新连接并保存"));
                   } catch (e) {
-                    notify(e instanceof Error ? e.message : "刷新失败");
+                    notify(e instanceof Error ? e.message : t("刷新失败"));
                   } finally {
                     setRefreshing(false);
                   }
                 }}
               >
-                {refreshing ? "正在刷新…" : "确认轮换凭证"}
+                {refreshing ? t("正在刷新…") : t("确认轮换凭证")}
               </button>
             </div>
           </div>

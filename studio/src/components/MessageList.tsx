@@ -1,3 +1,5 @@
+import { t, getLanguage } from "../i18n/runtime";
+import { useLanguage } from "../i18n/useLanguage";
 import { memo, useEffect, useRef, useState } from "react";
 import { Check, Copy, Sparkles, UserRound, ArrowDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -9,6 +11,7 @@ const MessageItem = memo(function MessageItem({
 }: {
   message: Message;
 }) {
+  useLanguage();
   const [copied, setCopied] = useState("");
   async function copy(id: string, text: string) {
     try {
@@ -32,21 +35,21 @@ const MessageItem = memo(function MessageItem({
         <div className="message-meta">
           <strong>
             {message.role === "user"
-              ? "你"
+              ? t("你")
               : message.role === "error"
-                ? "连接提示"
+                ? t("连接提示")
                 : "Muse"}
           </strong>
           <time>
-            {new Intl.DateTimeFormat("zh-CN", {
+            {new Intl.DateTimeFormat(getLanguage(), {
               hour: "2-digit",
               minute: "2-digit",
             }).format(message.createdAt)}
           </time>
           {message.status === "streaming" && (
-            <span className="stream-label">正在回复</span>
+            <span className="stream-label">{t("正在回复")}</span>
           )}
-          {message.status === "stopped" && <span>已停止接收</span>}
+          {message.status === "stopped" && <span>{t("已停止接收")}</span>}
         </div>
         <div className="prose">
           {message.role === "user" ? (
@@ -68,7 +71,8 @@ const MessageItem = memo(function MessageItem({
                 ),
               }}
             >
-              {message.text || " "}
+              {(message.role === "error" ? t(message.text) : message.text) ||
+                " "}
             </ReactMarkdown>
           )}
         </div>
@@ -76,10 +80,10 @@ const MessageItem = memo(function MessageItem({
           <button
             className="copy-message"
             onClick={() => void copy(message.id, message.text)}
-            aria-label="复制消息"
+            aria-label={t("复制消息")}
           >
             {copied === message.id ? <Check size={13} /> : <Copy size={13} />}
-            <span>{copied === message.id ? "已复制" : "复制"}</span>
+            <span>{copied === message.id ? t("已复制") : t("复制")}</span>
           </button>
         )}
       </div>
@@ -94,6 +98,7 @@ export function MessageList({
   messages: Message[];
   busy: boolean;
 }) {
+  useLanguage();
   const end = useRef<HTMLDivElement>(null),
     viewport = useRef<HTMLDivElement>(null),
     follow = useRef(true),
@@ -129,7 +134,7 @@ export function MessageList({
               <i />
               <i />
             </div>
-            <span>Muse 正在思考</span>
+            <span>{t("Muse 正在思考")}</span>
           </div>
         )}
         <div ref={end} />
@@ -144,7 +149,7 @@ export function MessageList({
           }}
         >
           <ArrowDown size={15} />
-          回到最新消息
+          {t("回到最新消息")}
         </button>
       )}
     </div>

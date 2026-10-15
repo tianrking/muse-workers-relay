@@ -1,3 +1,5 @@
+import { useLanguage } from "../i18n/useLanguage";
+import { t } from "../i18n/runtime";
 import { useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -32,6 +34,7 @@ export function AccountEditor({
   onClose,
   onSave,
 }: Props) {
+  useLanguage();
   const [tab, setTab] = useState<"account" | "connect" | "guide">("account"),
     [source, setSource] = useState<CredentialSource>(
       profile?.credentialSource || "esp32",
@@ -67,16 +70,18 @@ export function AccountEditor({
   });
   async function importFile(file: File) {
     try {
-      if (file.size > 65536) throw Error("配置文件不能超过 64 KB");
+      if (file.size > 65536) throw Error(t("配置文件不能超过 64 KB"));
       const raw = JSON.parse(await file.text());
       if (raw && !raw.access_token && typeof raw.device_id === "string") {
         if (!token.trim())
-          throw Error("请先导入 pairing.json，再补充 identity.json");
+          throw Error(t("请先导入 pairing.json，再补充 identity.json"));
         if (!raw.device_id.trim() || raw.device_id.length > 16000)
-          throw Error("device_id 无效");
+          throw Error(t("device_id 无效"));
         setDeviceId(raw.device_id.trim());
         setImportNote(
-          "已补齐 device_id，可用于手动刷新。请确认两个文件来自同一台 Linux 设备。",
+          t(
+            "已补齐 device_id，可用于手动刷新。请确认两个文件来自同一台 Linux 设备。",
+          ),
         );
         setError("");
         return;
@@ -90,14 +95,18 @@ export function AccountEditor({
       if (!name && typeof raw.username === "string") setName(raw.username);
       setImportNote(
         data.refresh_token && !data.device_id
-          ? "已导入聊天凭证。刷新还需要 device_id；Linux 可继续导入同设备的 identity.json，或使用完整导出工具。"
-          : "已导入设备凭证，保存后连接即可。文件中的服务器地址不会覆盖你的线路选择。",
+          ? t(
+              "已导入聊天凭证。刷新还需要 device_id；Linux 可继续导入同设备的 identity.json，或使用完整导出工具。",
+            )
+          : t(
+              "已导入设备凭证，保存后连接即可。文件中的服务器地址不会覆盖你的线路选择。",
+            ),
       );
       if (raw.credential_source === "linux" || file.name === "pairing.json")
         setSource("linux");
       setError("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "导入失败");
+      setError(e instanceof Error ? e.message : t("导入失败"));
     }
   }
   async function submit(event: React.FormEvent) {
@@ -105,22 +114,22 @@ export function AccountEditor({
     setError("");
     setSaving(true);
     try {
-      if (!name.trim()) throw Error("给这个账号起个名字");
+      if (!name.trim()) throw Error(t("给这个账号起个名字"));
       const p = makeProfile();
       if (p.mode === "relay" && p.server !== location.origin && !trusted)
-        throw Error("请确认你信任此自定义服务器");
+        throw Error(t("请确认你信任此自定义服务器"));
       if (sdkToken && !sdkToken.startsWith("mgst_"))
-        throw Error("SDK token 应以 mgst_ 开头");
+        throw Error(t("SDK token 应以 mgst_ 开头"));
       if (token.startsWith("mgst_"))
         throw Error(
-          "SDK token 不能用于聊天。请在「新账号接入」查看官方配对步骤",
+          t("SDK token 不能用于聊天。请在「新账号接入」查看官方配对步骤"),
         );
       if (!token.trim() && !sdkToken.trim())
-        throw Error("请导入设备凭证，或保存 SDK token 作为待配对账号");
+        throw Error(t("请导入设备凭证，或保存 SDK token 作为待配对账号"));
       if (p.mode === "relay" && !relayKey.trim())
-        throw Error("自定义中转需要中转 Token");
+        throw Error(t("自定义中转需要中转 Token"));
       if (remember && password.length < 10)
-        throw Error("本机解锁密码至少 10 个字符");
+        throw Error(t("本机解锁密码至少 10 个字符"));
       await onSave(
         p,
         {
@@ -134,15 +143,15 @@ export function AccountEditor({
       );
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "保存失败");
+      setError(e instanceof Error ? e.message : t("保存失败"));
     } finally {
       setSaving(false);
     }
   }
   return (
     <Modal
-      title={profile ? "编辑账号" : "添加 Muse 账号"}
-      subtitle="账号凭证由你掌握，连接方式随时可换。"
+      title={profile ? t("编辑账号") : t("添加 Muse 账号")}
+      subtitle={t("账号凭证由你掌握，连接方式随时可换。")}
       onClose={onClose}
       wide
     >
@@ -152,21 +161,21 @@ export function AccountEditor({
           onClick={() => setTab("account")}
         >
           <KeyRound size={15} />
-          账号授权
+          {t("账号授权")}
         </button>
         <button
           className={tab === "connect" ? "active" : ""}
           onClick={() => setTab("connect")}
         >
           <Server size={15} />
-          连接方式
+          {t("连接方式")}
         </button>
         <button
           className={tab === "guide" ? "active" : ""}
           onClick={() => setTab("guide")}
         >
           <Info size={15} />
-          新账号接入
+          {t("新账号接入")}
         </button>
       </div>
       <form onSubmit={submit}>
@@ -177,35 +186,39 @@ export function AccountEditor({
             <div>
               <strong>
                 {source === "esp32"
-                  ? "ESP32 配对后获取长 Token"
-                  : "Linux 电脑配对后获取长 Token"}
+                  ? t("ESP32 配对后获取长 Token")
+                  : t("Linux 电脑配对后获取长 Token")}
               </strong>
               <p>
                 {source === "esp32"
-                  ? "固件配置短 SDK token → 手机 Muse App 添加设备 → 圆屏确认 → 导入配对后的 access_token。"
-                  : "Linux SDK + 电脑蓝牙 → 手机 Muse App 确认 → 导入 pairing.json 或完整导出配置，无需 ESP32。"}
+                  ? t(
+                      "固件配置短 SDK token → 手机 Muse App 添加设备 → 圆屏确认 → 导入配对后的 access_token。",
+                    )
+                  : t(
+                      "Linux SDK + 电脑蓝牙 → 手机 Muse App 确认 → 导入 pairing.json 或完整导出配置，无需 ESP32。",
+                    )}
               </p>
               <button
                 type="button"
                 className="secondary"
                 onClick={() => setTab("guide")}
               >
-                查看获取步骤
+                {t("查看获取步骤")}
               </button>
             </div>
           </div>
           <div className="two-columns">
             <label>
-              账号名称
+              {t("账号名称")}
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={40}
-                placeholder="例如：我的 Muse"
+                placeholder={t("例如：我的 Muse")}
               />
             </label>
             <label>
-              网页设备名称
+              {t("网页设备名称")}
               <input
                 value={deviceName}
                 onChange={(e) => setDeviceName(e.target.value)}
@@ -221,8 +234,10 @@ export function AccountEditor({
           >
             <FileUp size={18} />
             <span>
-              导入配对凭证（ESP32 / Linux）
-              <small>支持 JSON、Linux pairing.json 与补充 identity.json</small>
+              {t("导入配对凭证（ESP32 / Linux）")}
+              <small>
+                {t("支持 JSON、Linux pairing.json 与补充 identity.json")}
+              </small>
             </span>
             <ArrowUpRight size={16} />
           </button>
@@ -249,16 +264,16 @@ export function AccountEditor({
               value={token}
               onChange={(e) => setToken(e.target.value)}
               autoComplete="off"
-              placeholder="配对完成后的 access_token"
+              placeholder={t("配对完成后的 access_token")}
             />
           </label>
           <div className="field-help">
-            聊天使用 device token。SDK token 请填在下面的高级字段。
+            {t("聊天使用 device token。SDK token 请填在下面的高级字段。")}
           </div>
           <details className="advanced">
-            <summary>高级凭证与刷新设置</summary>
+            <summary>{t("高级凭证与刷新设置")}</summary>
             <label>
-              Refresh token（可选）
+              {t("Refresh token（可选）")}
               <input
                 type="password"
                 value={refreshToken}
@@ -268,21 +283,21 @@ export function AccountEditor({
             </label>
             <div className="two-columns">
               <label>
-                配对 device_id（可选）
+                {t("配对 device_id（可选）")}
                 <input
                   value={deviceId}
                   onChange={(e) => setDeviceId(e.target.value)}
-                  placeholder="用于手动刷新凭证"
+                  placeholder={t("用于手动刷新凭证")}
                 />
               </label>
               <label>
-                SDK token（可选）
+                {t("SDK token（可选）")}
                 <input
                   type="password"
                   value={sdkToken}
                   onChange={(e) => setSdkToken(e.target.value)}
                   autoComplete="off"
-                  placeholder="mgst_…，用于官方配对／刷新"
+                  placeholder={t("mgst_…，用于官方配对／刷新")}
                 />
               </label>
             </div>
@@ -295,18 +310,18 @@ export function AccountEditor({
                 onChange={(e) => setRemember(e.target.checked)}
               />
               <LockKeyhole size={17} />
-              密码加密保存到这台设备
+              {t("密码加密保存到这台设备")}
             </label>
-            <p>默认仅当前页面内存。保存后，下次打开需要输入解锁密码。</p>
+            <p>{t("默认仅当前页面内存。保存后，下次打开需要输入解锁密码。")}</p>
             {remember && (
               <label>
-                本机解锁密码
+                {t("本机解锁密码")}
                 <input
                   type="password"
                   autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="至少 10 个字符；不会发送给服务器"
+                  placeholder={t("至少 10 个字符；不会发送给服务器")}
                 />
               </label>
             )}
@@ -320,8 +335,8 @@ export function AccountEditor({
               onClick={() => setMode("official")}
             >
               <Cloud size={22} />
-              <strong>默认中转（推荐）</strong>
-              <small>本站中转 · 无需填写中转 Token</small>
+              <strong>{t("默认中转（推荐）")}</strong>
+              <small>{t("本站中转 · 无需填写中转 Token")}</small>
               {mode === "official" && <Check size={15} />}
             </button>
             <button
@@ -330,8 +345,8 @@ export function AccountEditor({
               onClick={() => setMode("relay")}
             >
               <Radio size={22} />
-              <strong>自定义中转（高级）</strong>
-              <small>使用你信任的 Muse Relay</small>
+              <strong>{t("自定义中转（高级）")}</strong>
+              <small>{t("使用你信任的 Muse Relay")}</small>
               {mode === "relay" && <Check size={15} />}
             </button>
           </div>
@@ -339,10 +354,11 @@ export function AccountEditor({
             <div className="info-card">
               <ShieldCheck size={18} />
               <div>
-                <strong>已配置本站中转，无需额外设置</strong>
+                <strong>{t("已配置本站中转，无需额外设置")}</strong>
                 <p>
-                  默认通过本站中转连接 Muse 官方服务。你只需填写自己的 Muse
-                  device access token，无需填写中转地址或中转 Token。
+                  {t(
+                    "默认通过本站中转连接 Muse 官方服务。你只需填写自己的 Muse device access token，无需填写中转地址或中转 Token。",
+                  )}
                 </p>
                 <code>{location.origin}</code>
               </div>
@@ -350,7 +366,7 @@ export function AccountEditor({
           ) : (
             <>
               <label>
-                中转服务器地址
+                {t("中转服务器地址")}
                 <input
                   type="url"
                   value={server}
@@ -362,18 +378,19 @@ export function AccountEditor({
                 />
               </label>
               <label>
-                中转 Token
+                {t("中转 Token")}
                 <input
                   type="password"
                   value={relayKey}
                   onChange={(e) => setRelayKey(e.target.value)}
                   autoComplete="off"
-                  placeholder="该服务器的 X-Muse-Relay-Key"
+                  placeholder={t("该服务器的 X-Muse-Relay-Key")}
                 />
               </label>
               <div className="field-help">
-                服务器需支持 /fetch_vms、/web/noise 和来自本网站的
-                CORS／Origin。普通 HTTP 代理不兼容。
+                {t(
+                  "服务器需支持 /fetch_vms、/web/noise 和来自本网站的 CORS／Origin。普通 HTTP 代理不兼容。",
+                )}
               </div>
               {server.replace(/\/$/, "") !== location.origin && (
                 <label className="check-label trust">
@@ -382,7 +399,7 @@ export function AccountEditor({
                     checked={trusted}
                     onChange={(e) => setTrusted(e.target.checked)}
                   />
-                  我信任这个服务器，并同意向它发送此账号的凭证
+                  {t("我信任这个服务器，并同意向它发送此账号的凭证")}
                 </label>
               )}
             </>
@@ -391,22 +408,25 @@ export function AccountEditor({
             className="secondary"
             type="button"
             onClick={async () => {
-              setCheck("正在检测…");
+              setCheck(t("正在检测…"));
               try {
                 const result = await probe(makeProfile());
                 setCheck(
-                  "服务可达 · " + result.ms + " ms · Relay v" + result.version,
+                  t("服务可达 · ") +
+                    result.ms +
+                    " ms · Relay v" +
+                    result.version,
                 );
               } catch (e) {
-                setCheck(e instanceof Error ? e.message : "检测失败");
+                setCheck(e instanceof Error ? e.message : t("检测失败"));
               }
             }}
           >
-            检测服务器
+            {t("检测服务器")}
           </button>
           {check && (
             <p className="field-help" role="status">
-              {check}
+              {t(check)}
             </p>
           )}
         </div>
@@ -415,13 +435,13 @@ export function AccountEditor({
         </div>
         {error && (
           <div className="form-error" role="alert">
-            {error}
+            {t(error)}
           </div>
         )}
         <div className="modal-footer">
           <span>
             <LockKeyhole size={13} />
-            凭证不会嵌入网页源码
+            {t("凭证不会嵌入网页源码")}
           </span>
           <button
             type="button"
@@ -429,10 +449,10 @@ export function AccountEditor({
             onClick={onClose}
             disabled={saving}
           >
-            取消
+            {t("取消")}
           </button>
           <button className="primary" disabled={saving}>
-            {saving ? "正在保存…" : "保存账号"}
+            {saving ? t("正在保存…") : t("保存账号")}
           </button>
         </div>
       </form>

@@ -80,7 +80,7 @@ Un SDK token corto `mgst_…` no permite chatear por sí solo. Las credenciales 
 
 ## Verificación y límites
 
-En `relay/`: `pnpm test` y `pnpm exec wrangler deploy --dry-run --config wrangler.example.jsonc`. En `studio/`: `pnpm test` y `pnpm build`. Hay 16 pruebas de contrato del Worker y 9 del cliente. Las pruebas simuladas no sustituyen la validación del servicio desplegado.
+En `relay/`: `pnpm test` y `pnpm exec wrangler deploy --dry-run --config wrangler.example.jsonc`. En `studio/`: `pnpm test` y `pnpm build`. Hay 16 pruebas de contrato del Worker y 13 del cliente. Las pruebas simuladas no sustituyen la validación del servicio desplegado.
 
 Las pruebas reales anteriores en PC completaron consulta de cuenta, WebSocket 101, handshake Noise y respuestas de texto a través del relay. La rama de hardware conserva la conexión de Spotpear mediante un hotspot ordinario del usuario. El audio no está completamente validado. Esta reorganización no despliega cambios en producción.
 
@@ -94,7 +94,11 @@ Comprueba por separado: `/health` 200 → `/fetch_vms` 200 con credenciales prop
 
 Quitar los assets no elimina las rutas de adaptador de navegador sin clave compartida. Origin no es autenticación privada; si quieres restringir todo el tráfico a invitados, necesitas una política de acceso compatible o desactivar esos adaptadores. Consulta los [límites de confianza](docs/ARCHITECTURE.md).
 
-## Demo opcional: capturas históricas
+## Cliente opcional: inglés real y evidencia histórica
+
+Studio admite English / 简体中文 con una selección persistente. Las [capturas inglesas reales](studio/docs/ENGLISH-UI-VERIFICATION.md) proceden de una compilación de producción ejecutada en Chrome, sin generación de imágenes. No representan una nueva conexión autenticada. El [contrato del relay](docs/API.md) documenta cabeceras, JSON, WebSocket y errores independientemente del cliente.
+
+### Capturas chinas anteriores
 
 ![Diagnóstico de conexión a través del relay](studio/docs/connection-proof.png)
 

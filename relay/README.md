@@ -5,6 +5,7 @@ The platform-independent core of Mori. Entry point: [worker.template.mjs](worker
 - [Root overview and full API contract](../README.md)
 - [Step-by-step deployment, client configuration and troubleshooting](../docs/DEPLOYMENT.md)
 - [Architecture, lifecycle and trust boundaries](../docs/ARCHITECTURE.md)
+- [Wire contract: request headers, JSON, WebSocket auth and response errors](../docs/API.md)
 - [简体中文部署指南](../docs/GUIDE.zh-CN.md)
 - [Optional-client screenshots and evidence](../docs/SCREENSHOTS.md)
 - [Browser authentication details](BROWSER-API.zh-CN.md)

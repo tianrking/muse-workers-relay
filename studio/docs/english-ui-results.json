@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-15",
+  "source": "Local production build in Chrome",
+  "url": "http://127.0.0.1:5175/",
+  "language": "en",
+  "uiLanguageSelector": true,
+  "englishPersistsAfterReload": true,
+  "languageSwitchPreservesDraft": true,
+  "documentLanguage": "en",
+  "defaultAndCustomRelayEditor": true,
+  "englishSdkTokenRejection": true,
+  "esp32AndLinuxGuide": true,
+  "mobile": {
+    "width": 390,
+    "height": 844,
+    "sidebarOpenClose": true,
+    "viewportReset": true
+  },
+  "consoleWarningsOrErrors": [],
+  "authenticatedSessionTested": false,
+  "productionDeployed": false,
+  "screenshots": [
+    "studio-home.en.jpg",
+    "studio-relay-settings.en.jpg",
+    "studio-diagnostics.en.jpg",
+    "studio-mobile.en.jpg"
+  ],
+  "imageGenerationOrEditing": false,
+  "workerContractTests": 16,
+  "studioTests": 13,
+  "assets": [
+    "/assets/index-DcElcD0q.js",
+    "/assets/index-BcKuVcij.css"
+  ],
+  "screenshotSha256": {
+    "studio-home.en.jpg": "a354a5c5abda3a16ec6d1e6de20b521635380fba048450042cdcea7cb1bc979d",
+    "studio-relay-settings.en.jpg": "ae8f2391bdefe4f4e462c1cf0e3a47e68c5fb109cbb49e03b433476142c3bf83",
+    "studio-diagnostics.en.jpg": "8fa35797c2c202f4e19e64f40b8a8b7c923349e8f474da447d6eedf686cf0ab5",
+    "studio-mobile.en.jpg": "6b5f92eed5df236adba668447582e6640bee0e803a8e07d91da9bb776952a9f3"
+  },
+  "buildCredentialLeakCheck": {
+    "privateValuesChecked": 6,
+    "leaks": false
+  }
+}

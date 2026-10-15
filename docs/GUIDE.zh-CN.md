@@ -123,6 +123,20 @@ Worker → Settings → Domains & Routes → Add → Custom Domain，填写自�
 
 Origin 白名单不是账号认证，非浏览器可以伪造这些标头。**即使不部署网页，源码中的免共享 key 浏览器适配接口仍存在**；若要严格限定只有受邀客户端才能消耗中转资源，需要额外兼容的全站访问策略，或关闭这些适配入口。不能靠藏住网页或只设置 CORS 来保证私人访问。
 
+## Relay 请求与返回格式
+
+详见独立的 [API 格式契约](API.md)，包含原生接口和浏览器适配接口的完整请求头、占位 JSON、WS 子协议及错误响应。
+
+- GET /fetch_vms：device Bearer + X-Muse-Relay-Key；返回官方 vm_list，其中 vm_id 和 vm_auth_token 用于下一步。
+- POST /device_token/mint：合适的官方用户／会话 Bearer；body 为 device_id 及官方流程需要的 sdk_token。短 SDK token 不能单独授权。
+- POST /device_token/refresh：例如 Bearer hatch_refresh:<raw-refresh-token>；body 同样保留 device_id 和可选 sdk_token。返回新的 access_token / refresh_token，原样透传。
+- WS /v1/noise?vm_id=…：VM Bearer + 中转 key；成功返回 101，然后由客户端完成 Noise、注册和加密聊天串流。
+- 网页 /web/official-noise 或 /web/noise：通过 muse-v1 与 muse-auth.<base64url(JSON)> 子协议传 VM token；自定义中转还在 JSON 中带 key。
+- 本地错误是纯文本 HTTP 状态，上游错误保留原始格式；不能假设所有失败都是统一 JSON。
+- 账号接口不接收查询参数；WS 只允许一个 1–128 位字母、数字、下划线、连字符组成的 vm_id，不允许 target/url 或额外参数。
+
+这些示例用于解释协议，不是给出可用凭证；账号 REST、VM Token 和 Noise 加密应用协议必须分层理解。
+
 ## 截图怎么看
 
 - [连接诊断图](../studio/docs/connection-proof.png)：当时显示中转域名、账号鉴权、Noise／注册和独立线程成功。单次 2425 ms 握手不是加速基准。
@@ -130,4 +144,4 @@ Origin 白名单不是账号认证，非浏览器可以伪造这些标头。**�
 - [首页图](../studio/docs/studio-home.png)：只展示布局，不能证明中转成功。
 - [Linux 引导图](../studio/docs/linux-onboarding.png)：只验证引导界面，不证明 Linux 新配对完成。
 
-这些是 2026-10-15 留存的历史截图，本次只完善文档，没有重新登录账号、部署线上服务或烧录固件。更多技术细节见 [英文架构](ARCHITECTURE.md) 和 [逐步部署及排障](DEPLOYMENT.md)。
+上面四张为原始中文历史截图。新增 [实际英文 UI 验证](../studio/docs/ENGLISH-UI-VERIFICATION.md) 使用真实运行的生产构建，支持英文／中文切换，并保存了未连接状态和自定义 relay 设置的原始截图；没有图片生成或译图。本次没有重新登录 Muse 账号、部署线上服务或烧录固件。更多技术细节见 [英文架构](ARCHITECTURE.md) 和 [逐步部署及排障](DEPLOYMENT.md)。

@@ -86,7 +86,7 @@ PowerShell 可用 `Copy-Item wrangler.example.jsonc wrangler.local.jsonc`。部�
 
 ## 驗證與限制
 
-在 `relay/` 執行 `pnpm test`、`pnpm exec wrangler deploy --dry-run --config wrangler.example.jsonc`；在 `studio/` 執行 `pnpm test`、`pnpm build`。目前有 16 項 Worker 協定測試與 9 項 Studio 測試；模擬測試不能替代部署後的真實驗證。
+在 `relay/` 執行 `pnpm test`、`pnpm exec wrangler deploy --dry-run --config wrangler.example.jsonc`；在 `studio/` 執行 `pnpm test`、`pnpm build`。目前有 16 項 Worker 協定測試與 13 項 Studio 測試；模擬測試不能替代部署後的真實驗證。
 
 先前 PC 實測已完成中轉帳號查詢、WebSocket 101、Noise 握手與文字回覆。硬體分支保留 Spotpear 經使用者一般手機熱點連上中轉的紀錄。語音尚未完整驗收；本次分支整理不變更線上部署或韌體。
 
@@ -100,7 +100,11 @@ PowerShell 可用 `Copy-Item wrangler.example.jsonc wrangler.local.jsonc`。部�
 
 移除靜態 assets 不會移除免共享金鑰的瀏覽器適配路由；Origin 不是私人 API 身分驗證。若要限定所有流量僅供受邀客戶端使用，需額外相容的存取策略或停用那些適配入口，詳見 [信任邊界](docs/ARCHITECTURE.md)。
 
-## 可選網頁：歷史截圖
+## 可選網頁：實際英文介面與歷史證據
+
+Studio 支援 English / 简体中文，可保存語言偏好。[實際英文截圖與驗證](studio/docs/ENGLISH-UI-VERIFICATION.md) 來自 Chrome 運行的正式建置產物，未使用 AI 生成或圖片翻譯，不代表新的帳號連線實測。[中轉格式契約](docs/API.md) 另行說明標頭、JSON、WebSocket 授權與錯誤。
+
+### 先前中文截圖
 
 ![中轉連線診斷](studio/docs/connection-proof.png)
 

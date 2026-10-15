@@ -12,6 +12,7 @@ Deploy one configurable HTTPS/WSS origin for authorized Muse gadgets and custom 
 
 | Read next | Contents |
 | --- | --- |
+| [Relay wire contract](docs/API.md) | Exact paths, request headers, JSON examples, WS authentication and error responses |
 | [Architecture](docs/ARCHITECTURE.md) | Component and sequence diagrams, credentials, transparency and trust boundaries |
 | [Deployment guide](docs/DEPLOYMENT.md) | CLI or dashboard deployment, domains, client configuration and layered troubleshooting |
 | [Screenshots and evidence](docs/SCREENSHOTS.md) | What saved browser screenshots and PC results actually prove |
@@ -87,7 +88,7 @@ pnpm test
 pnpm build
 ```
 
-The current suite has 16 Worker contract tests and 9 Studio tests. Contract tests verify fixed upstreams, authorization, status/body preservation, WebSocket upgrade handling, CORS and failure cases. They do not replace deployed runtime tests.
+The current suite has 16 Worker contract tests and 13 Studio tests. Contract tests verify fixed upstreams, authorization, status/body preservation, WebSocket upgrade handling, CORS and failure cases. They do not replace deployed runtime tests.
 
 Prior PC live tests completed account lookup, WebSocket 101, Noise handshake and text replies through the relay. The preserved hardware branch records a paired Spotpear connecting through this relay on the user's ordinary phone hotspot. Voice was not fully validated. The repository split does not change or redeploy the running service or firmware.
 
@@ -110,13 +111,17 @@ Run from the repository root. Choose your Worker name before deployment. The web
 
 The existing personal deployment is [muse.2fast.cfd](https://muse.2fast.cfd). Self-hosters use their own domain and secret. Studio supports multiple local account profiles, independent threads, explicit main-session selection, custom relay addresses, streaming Markdown and optional encrypted local credential storage. See [Studio documentation](studio/README.zh-CN.md).
 
-## Optional browser adapter — English illustration
+## Optional English browser client — actual screenshots
 
-![English translation of archived connection diagnostics](studio/docs/connection-diagnostics.en.png)
+Studio now supports English and Simplified Chinese with a persistent language selector. The images below were captured directly from its running production build in Chrome on 2026-10-15. No image generation, browser translation or screenshot editing was used.
 
-**AI-translated documentation illustration based on the archived Chinese UI capture (2026-10-15).** This is not an original English UI screenshot, a released English interface, or a new live test. It illustrates the optional browser adapter: relay origin, account verification, Noise handshake and client registration. The single 2425 ms historical sample is not an acceleration benchmark.
+![Actual English relay settings in Mori Studio](studio/docs/studio-relay-settings.en.jpg)
 
-Original screenshots and dated protocol results are preserved in the [evidence guide](docs/SCREENSHOTS.md), with their original language and verification limits. The Worker remains the core product; this browser client is optional.
+This is the optional client's custom-relay configuration: server origin, relay key and explicit trust. The key is empty and no connection was initiated for this capture.
+
+![Actual English homepage in Mori Studio](studio/docs/studio-home.en.jpg)
+
+The homepage is deliberately disconnected with no profile loaded. These screenshots verify English UI, not a new authenticated Muse session. See [English UI verification](studio/docs/ENGLISH-UI-VERIFICATION.md), [actual disconnected diagnostics](studio/docs/studio-diagnostics.en.jpg) and [mobile screenshot](studio/docs/studio-mobile.en.jpg). Historical relay connectivity evidence is separately described in the [evidence guide](docs/SCREENSHOTS.md).
 
 ## License and attribution
 

@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 export class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -14,12 +15,14 @@ export class ErrorBoundary extends Component<
     if (this.state.failed)
       return (
         <main className="fatal-error">
-          <h1>工作空间暂时没有打开</h1>
+          <h1>{t("工作空间暂时没有打开")}</h1>
           <p>
-            请重新载入页面。未保存到本机的凭证需要重新导入，已有本机会话会保留。
+            {t(
+              "请重新载入页面。未保存到本机的凭证需要重新导入，已有本机会话会保留。",
+            )}
           </p>
           <button className="primary" onClick={() => location.reload()}>
-            重新载入
+            {t("重新载入")}
           </button>
         </main>
       );

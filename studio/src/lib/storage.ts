@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime.ts";
 import type { Profile, Conversation, Credentials } from "../types";
 const PREFIX = "mori.studio.v1.";
 export function load<T>(key: string, fallback: T): T {
@@ -63,7 +64,7 @@ export function newConversation(
   return {
     id: newId(),
     accountId,
-    title: kind === "main" ? "Muse 主会话" : "新的对话",
+    title: kind === "main" ? t("Muse 主会话") : t("新的对话"),
     kind,
     sessionId: kind === "thread" ? newId() : null,
     messages: [],
@@ -106,7 +107,9 @@ export function markdown(conversation: Conversation) {
     "\n\n" +
     conversation.messages
       .filter((m) => m.role !== "error")
-      .map((m) => "## " + (m.role === "user" ? "你" : "Muse") + "\n\n" + m.text)
+      .map(
+        (m) => "## " + (m.role === "user" ? t("你") : "Muse") + "\n\n" + m.text,
+      )
       .join("\n\n")
   );
 }
