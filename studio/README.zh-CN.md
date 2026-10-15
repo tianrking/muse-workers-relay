@@ -7,7 +7,7 @@
 ## 已实现
 
 - 多账号连接档案：命名、导入配对 JSON、编辑、切换、锁定、停用与恢复。各档案的凭证按 ID 独立保存在内存。
-- 官方服务模式：使用调用者自己的 device access token，不需要本项目的共享中转密钥。仍经过同源浏览器适配入口；不是绕过入口的官方直连。
+- 默认中转（推荐）：通过本站 Worker（生产域名 https://muse.2fast.cfd）访问官方服务，用户只填自己的 device access token；无需填写中转地址或中转 Token。共享中转密钥只保留在 Worker Secret，不嵌入网页。内部兼容字段 mode=official 保持不变，已有此模式的账号自动显示为默认中转；自定义线路仍保留。
 - 自定义 HTTPS 中转：可编辑域名、密钥、检测连通性；跨域服务需要配置 CORS 与 Origin 白名单。保存其他域名前须明确确认信任。
 - 独立会话：默认生成 UUID，通过官方 session_id 创建线程，校验官方回包的会话 ID 和 is_thread=true，不把独立会话成功冒充成 main。主会话需要显式选择。
 - 会话命名、搜索、本机归档与恢复、Markdown 导出；本机记录与账号 ID 隔离。
@@ -23,7 +23,7 @@ SDK token（mgst_…）用于官方 gadget 配对，不能单独作为聊天 tok
 1. 在 https://gadgets.muse.ai 创建自己的 SDK token。
 2. 按官方 SDK 文档配置 gadget，在 Muse App 的 Settings → Devices 开启 Developer mode，添加并确认设备。
 3. 从自己的配对配置导入 access_token。可选提供 refresh_token、device_id、sdk_token 以支持手动刷新。
-4. 在 Mori 添加账号，选择官方服务或你信任的中转，然后连接。也可只保存 SDK token 作为待配对档案，界面不会将其标记为已授权。
+4. 在 Mori 添加账号，使用默认中转，或在连接方式中选择你信任的自定义中转，然后连接。也可只保存 SDK token 作为待配对档案，界面不会将其标记为已授权。
 
 纯网页无法充当官方手机配对所需的蓝牙外设。项目不抓取官方网页登录 cookie，不提供未公开的账号 OAuth，不假装 SDK token 可以直接绑定聊天账号。官方说明：https://github.com/facebookincubator/muse-gadget-sdk
 

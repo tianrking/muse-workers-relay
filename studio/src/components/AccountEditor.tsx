@@ -93,7 +93,7 @@ export function AccountEditor({
       if (!token.trim() && !sdkToken.trim())
         throw Error("请导入设备凭证，或保存 SDK token 作为待配对账号");
       if (p.mode === "relay" && !relayKey.trim())
-        throw Error("自定义中转需要中转密钥");
+        throw Error("自定义中转需要中转 Token");
       if (remember && password.length < 10)
         throw Error("本机解锁密码至少 10 个字符");
       await onSave(
@@ -267,8 +267,8 @@ export function AccountEditor({
               onClick={() => setMode("official")}
             >
               <Cloud size={22} />
-              <strong>官方服务</strong>
-              <small>官方 API + 浏览器兼容入口</small>
+              <strong>默认中转（推荐）</strong>
+              <small>本站中转 · 无需填写中转 Token</small>
               {mode === "official" && <Check size={15} />}
             </button>
             <button
@@ -277,7 +277,7 @@ export function AccountEditor({
               onClick={() => setMode("relay")}
             >
               <Radio size={22} />
-              <strong>自定义中转</strong>
+              <strong>自定义中转（高级）</strong>
               <small>使用你信任的 Muse Relay</small>
               {mode === "relay" && <Check size={15} />}
             </button>
@@ -286,12 +286,12 @@ export function AccountEditor({
             <div className="info-card">
               <ShieldCheck size={18} />
               <div>
-                <strong>服务由 Muse 官方提供</strong>
+                <strong>已配置本站中转，无需额外设置</strong>
                 <p>
-                  浏览器受跨域和 WebSocket 请求头限制，使用本网站的兼容入口访问
-                  api.muse.ai 与官方 Muse
-                  服务，不需要共享中转密钥。此模式不是绕过兼容入口的直连。
+                  默认通过本站中转连接 Muse 官方服务。你只需填写自己的 Muse
+                  device access token，无需填写中转地址或中转 Token。
                 </p>
+                <code>{location.origin}</code>
               </div>
             </div>
           ) : (
@@ -309,7 +309,7 @@ export function AccountEditor({
                 />
               </label>
               <label>
-                中转密钥
+                中转 Token
                 <input
                   type="password"
                   value={relayKey}

@@ -796,7 +796,7 @@ export default function App() {
           </span>
           <button onClick={() => setDiagnostics(true)}>
             <Icon size={12} />
-            {active?.mode === "relay" ? "自定义中转" : "官方服务"}
+            {active?.mode === "relay" ? "自定义中转" : "默认中转"}
             <span>↗</span>
           </button>
         </footer>
@@ -827,7 +827,7 @@ export default function App() {
                     {profile.disabled ? " · 已停用" : ""}
                   </strong>
                   <small>
-                    {profile.mode === "official" ? "官方服务" : profile.server}{" "}
+                    {profile.mode === "official" ? "默认中转" : profile.server}{" "}
                     ·{" "}
                     {secrets.current.get(profile.id)?.access_token
                       ? "已授权"
@@ -991,7 +991,9 @@ export default function App() {
               <span>浏览器</span>
               <ChevronRight size={15} />
               <span>
-                {active?.mode === "relay" ? "自定义 Relay" : "浏览器兼容入口"}
+                {active?.mode === "relay"
+                  ? "自定义 Relay"
+                  : "本站默认中转 · 免填中转 Token"}
               </span>
               <ChevronRight size={15} />
               <span>Muse 官方</span>
