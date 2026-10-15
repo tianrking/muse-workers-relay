@@ -1,0 +1,11 @@
+{
+  "name": "muse-personal-relay",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test worker.test.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.150.0"
+  }
+}

@@ -1,0 +1,4 @@
+worker.mjs
+.wrangler/
+node_modules/
+worker.js
