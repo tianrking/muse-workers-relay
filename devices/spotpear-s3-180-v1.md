@@ -25,3 +25,7 @@ Run tools/benchmark_spotpear.py --port COM3 --output swipe-benchmark.log for eig
 Final selected profile: two 360-row PSRAM buffers and two 24-row internal DMA buffers. Mean refresh 39.33ms, p95 43.59ms, 62.7% less refresh work than baseline. See ../docs/perf/results.md for definitions and memory measurements.
 
 Chinese network-name display: Settings now copies its Montserrat 16/20 and unscii-16 descriptors and attaches the existing muse_font_cjk_16 fallback. Labels and text entry retain Latin metrics and icons. Scan/join SSID bytes are unchanged. CJK coverage comes from the existing Unifont basic ideograph/punctuation/kana/fullwidth subset; arbitrary legacy SSID byte encodings are not converted.
+
+## 2026-10-15 current relay flash
+
+COM4 was positively identified as MuseGadget-1E613C and flashed with the muse.2fast.cfd relay configuration using IDF 6.1. Write hash verification succeeded and existing pairing was retained. Device status returned Connected / Online on the omg phone hotspot; the user confirmed local Internet without a proxy/VPN and reported the device usable. See [the detailed verification record](../relay/MCU-HOTSPOT-VERIFICATION.md) for the weak Hera_803 trial, the occupied voice turn and acceptance limits.

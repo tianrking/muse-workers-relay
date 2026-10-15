@@ -158,18 +158,18 @@ Usa la URL workers.dev para web y relay, o vincula un dominio propio. El mismo o
 
 Estado registrado el **15 de octubre de 2026**:
 
-- Firmware compilado y grabado con IDF 6.1; pantalla/UI confirmadas por el usuario y conversaciones correctas. Salida audible DAC sin verificar; no se ha repetido una prueba USB ahora.
+- Firmware compilado y grabado con IDF 6.1; pantalla/UI confirmadas por el usuario y conversaciones correctas. Salida audible DAC sin verificar; grabación COM4 y estado Online verificados en esta prueba.
 - Trabajo medio de refresco reducido de 105,41 a 39,33 ms. No es una medida de FPS del panel.
 - Pruebas web reales de cuenta, Noise, chat principal, hilos independientes, relay personalizado y reanudación. Los perfiles usaron la misma cuenta; no prueban registro de cuentas nuevas.
 - Pasaron 9 pruebas cliente/exportador y 16 pruebas Worker. No equivalen a pruebas de resistencia prolongadas.
 - Token SDK solo: mint 401. Token de dispositivo existente mediante relay: consulta 200.
 - Importación/exportación Linux probada localmente; BLE real y propiedad de archivos en Linux pendientes.
-- PC con proxy y conversaciones MCU mediante relay verificadas anteriormente. Acceso mundial y Wi-Fi doméstico sin proxy no demostrados.
+- PC con proxy y conversaciones MCU mediante relay verificadas anteriormente. MCU Online en omg, que el usuario confirmó sin proxy; otras redes y acceso mundial no demostrados.
 - Renovación manual y reintentos implementados; rotación real compartida y desconexiones forzadas prolongadas no validadas.
 
 La suite histórica de firmware informó 129 pruebas correctas y 28 omitidas; la suite POSIX upstream completa no pasó en Windows. La importación automatizada por Chrome se bloqueó por falta de permiso de URL de archivo en la extensión; el parser sí tiene pruebas locales. Evidencia: [web](studio/docs/VERIFICATION.zh-CN.md), [Linux](studio/docs/LINUX-ONBOARDING.zh-CN.md), [relay](relay/LIVE-VERIFICATION.zh-CN.md), [pantalla](docs/perf/results.md).
 
-Despliegue web actual: `mori-studio-v1.4`, versión `3fd6e9ef-8f9f-4def-a262-a0ce047e9385`. La última prueba de la placa física utilizó el dominio relay anterior; publicar la web no grabó el MCU.
+Despliegue web actual: `mori-studio-v1.4`, versión `3fd6e9ef-8f9f-4def-a262-a0ce047e9385`. El MCU ya fue grabado con muse.2fast.cfd y devolvió Connected / Online en el hotspot omg. El usuario confirmó que no había proxy/VPN y que funcionaba. Véase [el registro de hardware](relay/MCU-HOTSPOT-VERIFICATION.md); no constituye una prueba prolongada ni mundial.
 
 ## Diagnóstico y publicación
 

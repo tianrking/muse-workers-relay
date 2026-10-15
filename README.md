@@ -160,20 +160,20 @@ Internal profile `mode=official` means the same-origin official-service adapter,
 
 Status recorded **2026-10-15**:
 
-| Area              | Verified                                                                   | Limits                                                                  |
-| ----------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Firmware          | IDF 6.1 build/flash, user-confirmed screen/UI and successful conversations | Audible DAC output unverified; no current USB retest                    |
-| Display           | Mean refresh work improved from 105.41 ms to 39.33 ms                      | LVGL refresh measurement, not panel FPS                                 |
-| Browser           | Account/Noise, main and independent replies, custom relay, thread resume   | Same account used in different profiles; not new-account registration   |
-| Tests             | 9 client/export + 16 Worker tests passed                                   | Local contracts do not prove long-term reliability                      |
-| Authorization     | SDK-only mint 401; existing device lookup via relay 200                    | Web-login-to-device-token flow not verified                             |
-| Linux             | Import/export parsing and handling                                         | Real BLE pairing and Linux file ownership untested                      |
-| Network           | PC proxy path and earlier MCU relay conversations                          | Ordinary unproxied domestic Wi-Fi and worldwide reachability unverified |
-| Refresh/reconnect | Manual refresh and bounded retry implemented                               | Shared-token rotation and forced-drop endurance not accepted            |
+| Area              | Verified                                                                   | Limits                                                                                      |
+| ----------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Firmware          | IDF 6.1 build/flash, user-confirmed screen/UI and successful conversations | Audible DAC output unverified; current COM4 flash and Online status verified                |
+| Display           | Mean refresh work improved from 105.41 ms to 39.33 ms                      | LVGL refresh measurement, not panel FPS                                                     |
+| Browser           | Account/Noise, main and independent replies, custom relay, thread resume   | Same account used in different profiles; not new-account registration                       |
+| Tests             | 9 client/export + 16 Worker tests passed                                   | Local contracts do not prove long-term reliability                                          |
+| Authorization     | SDK-only mint 401; existing device lookup via relay 200                    | Web-login-to-device-token flow not verified                                                 |
+| Linux             | Import/export parsing and handling                                         | Real BLE pairing and Linux file ownership untested                                          |
+| Network           | PC proxy path and earlier MCU relay conversations                          | MCU Online on omg, reported without proxy; other networks and worldwide coverage unverified |
+| Refresh/reconnect | Manual refresh and bounded retry implemented                               | Shared-token rotation and forced-drop endurance not accepted                                |
 
 Historical firmware host tests reported 129 passed and 28 skipped; the complete upstream POSIX suite did not pass on this Windows host. Evidence: [browser](studio/docs/VERIFICATION.zh-CN.md), [Linux](studio/docs/LINUX-ONBOARDING.zh-CN.md), [relay](relay/LIVE-VERIFICATION.zh-CN.md), [display](docs/perf/results.md). Chrome automated file import was blocked by missing extension file-URL permission; import parsing has local test coverage.
 
-Current web deployment: `mori-studio-v1.4`, version `3fd6e9ef-8f9f-4def-a262-a0ce047e9385`. The last physical MCU relay test used the older relay domain; the new web deployment did not flash that board.
+Current web deployment: `mori-studio-v1.4`, version `3fd6e9ef-8f9f-4def-a262-a0ce047e9385`. The MCU has now been flashed with muse.2fast.cfd and returned Connected / Online on the omg phone hotspot. The user confirmed no proxy/VPN and reported the device usable. See [the hardware verification record](relay/MCU-HOTSPOT-VERIFICATION.md); this does not establish worldwide reachability or a long-duration reliability result.
 
 ## Troubleshooting
 
