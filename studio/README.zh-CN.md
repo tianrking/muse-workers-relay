@@ -61,3 +61,13 @@ pnpm test
 个人客户端，非 Meta 官方产品。只有已配对并获得有效 device 凭证的用户可访问官方服务；SDK token 不能绕过官方授权。云端聊天记录与本机记录不同，本机归档不删除云端数据。停止接收只停止前端流，不承诺取消云端任务。聊天记录以明文保存在此浏览器，凭证只有选择保存时才加密持久化。
 
 电脑当前使用 Mihomo TUN；测试不证明国内任意普通 Wi-Fi 无代理可达。语音不在当前版本验收范围。真实新账号注册/手机配对、真实 refresh token 轮换需要该账号所有者完成，不用现有 MCU 共用凭证代替这些验证。
+
+## ESP32 与 Linux 凭证来源
+
+添加账号时选择获取路线，查看「新账号接入」步骤。现有 ESP32 路线保留；Linux 可以不用开发板，但官方首次配对仍需本地 BLE 外设广播和手机 Muse App。来源选项只记录获取方式，不改变协议或自动发起配对。
+
+Linux 官方 pairing.json 可以直接导入；文件不含 device_id 时页面提示补充同设备 identity.json。也可下载 /assets/mori-linux-export.py，在 Linux 执行 sudo python3 mori-linux-export.py --output ./mori-device.json。离线工具只读官方配对与身份文件，只导出需要的字段，不包含身份私钥、不访问网络、不打印 Token、不覆盖已有文件；Linux 输出权限 0600，并交还 sudo 调用用户。网页本身仍是纯 React 静态应用，不需要 Python 服务。
+
+默认中转的 /web/account、/web/refresh、/web/official-noise 与传统 /fetch_vms、/device_token/refresh、/v1/noise 都不区分 Token 来源。将 Linux 凭证导入网页即可使用同一中转。未经修改的官方 Linux SDK 不会自动添加 X-Muse-Relay-Key，因此不能只把其 API 域名改成受密钥保护的 MCU 路由就宣称支持；此版本支持的是 Linux 凭证经网页接入中转。
+
+避免 Linux 服务与网页同时轮换同一 refresh_token；可在导出后停用 Linux 服务。网页刷新保持手动确认。真实 Linux 蓝牙配对与 Linux 输出文件所有权仍待 Linux 主机实测。

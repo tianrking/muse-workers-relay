@@ -21,3 +21,5 @@
 MUSE_RELAY_KEY 通过 Secret 注入。关闭日志和追踪。静态资源目录为 ../studio/dist。官方账号 API 和 Noise 的错误状态保留给客户端；响应无账号缓存，Set-Cookie 不透传。
 
 自定义中转需实现同样的 REST/WS 契约并允许前端 Origin。网页选择自定义服务器会将该账号凭证交给服务器，只有明确确认信任后才能保存外站配置。
+
+凭证来源：ESP32 与 Linux 官方配对得到的 device access token 使用同一套鉴权和 Noise 链路，浏览器无需 source 参数。来源标记只在前端保存。Linux 官方 pairing.json 导入网页后可使用免共享密钥的同站入口；官方 Linux SDK 本身未自动适配共享中转请求头，不能直接替换其域名后使用传统受保护路由。

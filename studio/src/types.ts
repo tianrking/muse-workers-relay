@@ -1,3 +1,4 @@
+export type CredentialSource = "esp32" | "linux";
 export type ConnectionMode = "official" | "relay";
 export interface Credentials {
   access_token: string;
@@ -15,6 +16,7 @@ export interface Profile {
   id: string;
   name: string;
   deviceName: string;
+  credentialSource?: CredentialSource;
   mode: ConnectionMode;
   server: string;
   vmId?: string;

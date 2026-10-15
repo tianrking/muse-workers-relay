@@ -126,3 +126,25 @@ test("stopping before the chat acknowledgement releases the pending request prom
   assert.equal(client.streams.size, 0);
   client.close();
 });
+
+test("Linux official pairing credentials import without trusting supplied server addresses", () => {
+  const data = credentialsFrom({
+    access_token: "hatch-device-token:linux-test",
+    refresh_token: "hatch_refresh:linux-test",
+    token_type: "device",
+    api_url_v2: "https://untrusted.example",
+    noise_host: "untrusted.example",
+  });
+  assert.deepEqual(data, {
+    access_token: "hatch-device-token:linux-test",
+    refresh_token: "hatch_refresh:linux-test",
+  });
+  const exported = credentialsFrom({
+    access_token: "hatch-device-token:linux-test",
+    refresh_token: "hatch_refresh:linux-test",
+    device_id: "hatch-link:linux-test",
+    credential_source: "linux",
+  });
+  assert.equal(exported.device_id, "hatch-link:linux-test");
+  assert.equal(exported.relay_key, undefined);
+});

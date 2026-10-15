@@ -11,10 +11,11 @@ import {
   Server,
   ShieldCheck,
 } from "lucide-react";
+import { OnboardingGuide, SourcePicker } from "./OnboardingGuide";
 import { Modal } from "./Modal";
 import { credentialsFrom, newId, normalizeServer } from "../lib/storage";
 import { probe } from "../lib/account-api";
-import type { Profile, Credentials } from "../types";
+import type { Profile, Credentials, CredentialSource } from "../types";
 type Props = {
   profile?: Profile;
   credentials?: Credentials;
@@ -32,6 +33,10 @@ export function AccountEditor({
   onSave,
 }: Props) {
   const [tab, setTab] = useState<"account" | "connect" | "guide">("account"),
+    [source, setSource] = useState<CredentialSource>(
+      profile?.credentialSource || "esp32",
+    ),
+    [importNote, setImportNote] = useState(""),
     [name, setName] = useState(profile?.name || ""),
     [deviceName, setDeviceName] = useState(profile?.deviceName || "Mori Web"),
     [mode, setMode] = useState(profile?.mode || "official"),
@@ -55,6 +60,7 @@ export function AccountEditor({
     name: name.trim(),
     deviceName: deviceName.trim() || "Mori Web",
     mode,
+    credentialSource: source,
     server: mode === "relay" ? normalizeServer(server) : location.origin,
     vmId: profile?.vmId,
     createdAt: profile?.createdAt || Date.now(),
@@ -62,14 +68,33 @@ export function AccountEditor({
   async function importFile(file: File) {
     try {
       if (file.size > 65536) throw Error("配置文件不能超过 64 KB");
-      const raw = JSON.parse(await file.text()),
-        data = credentialsFrom(raw);
+      const raw = JSON.parse(await file.text());
+      if (raw && !raw.access_token && typeof raw.device_id === "string") {
+        if (!token.trim())
+          throw Error("请先导入 pairing.json，再补充 identity.json");
+        if (!raw.device_id.trim() || raw.device_id.length > 16000)
+          throw Error("device_id 无效");
+        setDeviceId(raw.device_id.trim());
+        setImportNote(
+          "已补齐 device_id，可用于手动刷新。请确认两个文件来自同一台 Linux 设备。",
+        );
+        setError("");
+        return;
+      }
+      const data = credentialsFrom(raw);
       setToken(data.access_token);
       setRelayKey(data.relay_key || "");
       setRefreshToken(data.refresh_token || "");
       setDeviceId(data.device_id || "");
       setSdkToken(data.sdk_token || "");
       if (!name && typeof raw.username === "string") setName(raw.username);
+      setImportNote(
+        data.refresh_token && !data.device_id
+          ? "已导入聊天凭证。刷新还需要 device_id；Linux 可继续导入同设备的 identity.json，或使用完整导出工具。"
+          : "已导入设备凭证，保存后连接即可。文件中的服务器地址不会覆盖你的线路选择。",
+      );
+      if (raw.credential_source === "linux" || file.name === "pairing.json")
+        setSource("linux");
       setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "导入失败");
@@ -146,6 +171,29 @@ export function AccountEditor({
       </div>
       <form onSubmit={submit}>
         <div hidden={tab !== "account"} className="panel-body">
+          <SourcePicker value={source} onChange={setSource} />
+          <div className="info-card">
+            <Info size={18} />
+            <div>
+              <strong>
+                {source === "esp32"
+                  ? "ESP32 配对后获取长 Token"
+                  : "Linux 电脑配对后获取长 Token"}
+              </strong>
+              <p>
+                {source === "esp32"
+                  ? "固件配置短 SDK token → 手机 Muse App 添加设备 → 圆屏确认 → 导入配对后的 access_token。"
+                  : "Linux SDK + 电脑蓝牙 → 手机 Muse App 确认 → 导入 pairing.json 或完整导出配置，无需 ESP32。"}
+              </p>
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => setTab("guide")}
+              >
+                查看获取步骤
+              </button>
+            </div>
+          </div>
           <div className="two-columns">
             <label>
               账号名称
@@ -173,8 +221,8 @@ export function AccountEditor({
           >
             <FileUp size={18} />
             <span>
-              导入官方配对凭证或旧版配置
-              <small>支持 JSON，内容只在浏览器中读取</small>
+              导入配对凭证（ESP32 / Linux）
+              <small>支持 JSON、Linux pairing.json 与补充 identity.json</small>
             </span>
             <ArrowUpRight size={16} />
           </button>
@@ -189,6 +237,11 @@ export function AccountEditor({
               e.target.value = "";
             }}
           />
+          {importNote && (
+            <p className="field-help" role="status">
+              {importNote}
+            </p>
+          )}
           <label>
             Device access token
             <input
@@ -358,69 +411,7 @@ export function AccountEditor({
           )}
         </div>
         <div hidden={tab !== "guide"} className="panel-body">
-          <div className="onboarding-intro">
-            <span className="guide-badge">OFFICIAL ONBOARDING</span>
-            <h3>第一次使用 Muse？</h3>
-            <p>
-              账号授权与 SDK 授权是两件事。按官方流程配对后，再把设备凭证接入
-              Mori。
-            </p>
-          </div>
-          <ol className="guide-steps">
-            <li>
-              <span>01</span>
-              <div>
-                <strong>创建你的 SDK token</strong>
-                <p>
-                  登录 Muse Gadgets，在 Account → SDK tokens 中创建自己的
-                  token。
-                </p>
-                <a
-                  href="https://gadgets.muse.ai"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  打开官方 SDK 控制台 <ArrowUpRight size={13} />
-                </a>
-              </div>
-            </li>
-            <li>
-              <span>02</span>
-              <div>
-                <strong>通过 Muse App 完成官方配对</strong>
-                <p>
-                  为官方 ESP32／Linux gadget 配置 SDK token，在手机 Settings →
-                  Devices 开启 Developer mode，添加设备并确认。只有 SDK token
-                  不能换取聊天权限。
-                </p>
-              </div>
-            </li>
-            <li>
-              <span>03</span>
-              <div>
-                <strong>导入配对后的 device 凭证</strong>
-                <p>
-                  从你自己的已配对设备取得 access_token；需要刷新时同时提供
-                  refresh_token 和 device_id。纯网页不能冒充蓝牙外设完成这一步。
-                </p>
-                <a
-                  href="https://github.com/facebookincubator/muse-gadget-sdk"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  查看官方配对说明 <ArrowUpRight size={13} />
-                </a>
-              </div>
-            </li>
-          </ol>
-          <div className="info-card">
-            <KeyRound size={18} />
-            <p>
-              也可以先在高级字段保存自己的 SDK
-              token，账号会显示「待官方配对」，完成后再补齐 device
-              token。不会显示虚假的绑定成功。
-            </p>
-          </div>
+          <OnboardingGuide source={source} onChange={setSource} />
         </div>
         {error && (
           <div className="form-error" role="alert">
