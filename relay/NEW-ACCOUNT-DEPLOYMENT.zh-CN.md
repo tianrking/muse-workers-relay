@@ -1,5 +1,7 @@
 # 新账号 Worker 上线与验证
 
+最新：React Mori Studio 已上线（relay v4），生产版本 19c990b9-89f7-44e6-a582-d586c25a1094。当前项目说明和实测见 ../studio/README.zh-CN.md、../studio/docs/VERIFICATION.zh-CN.md；下文 v2/v3 内容为历史记录。
+
 后续更新：同日已上线 relay v3 纯网页入口，当前生产版本为 98060ffd-8972-44f7-8198-e42deac8cfc6。使用和浏览器验收见 ../playground/README.zh-CN.md。下文保留 v2 上线时的测试记录。
 
 日期：2026-10-15。账号：Tienjuiwong@gmail.com。Worker：muse。

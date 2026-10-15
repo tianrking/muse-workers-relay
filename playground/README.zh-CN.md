@@ -1,4 +1,6 @@
-# Muse 小小会客厅（纯网页）
+# Muse 小小会客厅（历史原型）
+
+当前线上版本已经升级为 React Mori Studio。最新项目和说明见 ../studio/README.zh-CN.md；这里保留早期纯 JavaScript 原型。
 
 打开：https://muse.2fast.cfd/
 

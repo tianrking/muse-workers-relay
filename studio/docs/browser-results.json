@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-15",
+  "url": "https://muse.2fast.cfd/",
+  "deployment": "19c990b9-89f7-44e6-a582-d586c25a1094",
+  "relayVersion": 4,
+  "officialBrowserMode": true,
+  "independentThreads": [
+    {
+      "sessionId": "44204e8d-d80f-4bd0-8baa-052df72b3af6",
+      "isThread": true,
+      "reply": "独立会话创建成功 🌱",
+      "resumedReply": "刷新后继续成功。"
+    },
+    {
+      "sessionId": "35e8dc3e-21ca-4127-83b8-aed81398216c",
+      "isThread": true,
+      "reply": "第二间房间也成功 🌷"
+    }
+  ],
+  "customRelay": {
+    "origin": "https://muse.tienjuiwong.workers.dev",
+    "reply": "自定义线路也成功 🌿",
+    "passed": true
+  },
+  "mainReply": "主会话也成功。",
+  "checks": {
+    "profileSwitchIsolation": true,
+    "renameArchiveRestore": true,
+    "mobile390x844": true,
+    "typescript": true,
+    "productionBuild": true,
+    "workerTests": 16,
+    "clientTests": 7,
+    "buildCredentialLeaks": false
+  },
+  "limits": [
+    "Existing paired account used for both connection profiles",
+    "No automatic new-account pairing",
+    "No real shared-device refresh rotation",
+    "PC uses Mihomo TUN",
+    "No voice verification"
+  ]
+}
