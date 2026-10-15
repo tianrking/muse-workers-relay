@@ -62,3 +62,11 @@ output/
 /tools/hotspot/*.json
 *.pcap
 *.pcapng
+
+# Local deployment settings and environment secrets
+**/.dev.vars
+**/.dev.vars.*
+**/wrangler.local.jsonc
+.env
+.env.*
+!.env.example
