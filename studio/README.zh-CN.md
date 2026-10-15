@@ -42,7 +42,7 @@ pnpm build
 pnpm test
 ```
 
-开发前端默认 127.0.0.1:5173；Vite 将 /web、/fetch_vms 等请求代理到 VITE_DEV_ADAPTER_URL（默认当前生产适配入口），因此可以联调真实接口。后端应将本机 Origin 加入 BROWSER_ORIGINS。要本地调试 Worker，可先构建，再从 ../relay 执行 Wrangler dev --config wrangler.test-account.jsonc，并通过忽略的 .dev.vars 配置 Secret；生产部署使用同一配置的 versions upload 与 versions deploy。
+开发前端默认 127.0.0.1:5173；Vite 将 /web、/fetch_vms 等请求代理到 VITE_DEV_ADAPTER_URL（默认当前生产适配入口），因此可以联调真实接口。后端应将本机 Origin 加入 BROWSER_ORIGINS；先复制 ../relay/wrangler.web.example.jsonc 为忽略的 wrangler.local.jsonc，并设置自己的 Worker 名称。要本地调试 Worker，可先构建，再从 ../relay 执行 Wrangler dev --config wrangler.local.jsonc，并通过忽略的 .dev.vars 配置 Secret；生产部署使用同一配置的 versions upload 与 versions deploy。
 
 ## 工程结构
 

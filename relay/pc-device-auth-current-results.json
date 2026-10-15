@@ -1,5 +1,0 @@
-{
-  "test": "Existing paired device authorization through relay",
-  "httpStatus": "200",
-  "vmCount": 1
-}
