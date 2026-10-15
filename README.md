@@ -110,17 +110,13 @@ Run from the repository root. Choose your Worker name before deployment. The web
 
 The existing personal deployment is [muse.2fast.cfd](https://muse.2fast.cfd). Self-hosters use their own domain and secret. Studio supports multiple local account profiles, independent threads, explicit main-session selection, custom relay addresses, streaming Markdown and optional encrypted local credential storage. See [Studio documentation](studio/README.zh-CN.md).
 
-## Optional demo screenshots — historical evidence
+## Optional browser adapter — English illustration
 
-The screenshots below show an optional client of the relay, captured on 2026-10-15. They are not new live tests.
+![English translation of archived connection diagnostics](studio/docs/connection-diagnostics.en.png)
 
-![Connected relay diagnostics](studio/docs/connection-proof.png)
+**AI-translated documentation illustration based on the archived Chinese UI capture (2026-10-15).** This is not an original English UI screenshot, a released English interface, or a new live test. It illustrates the optional browser adapter: relay origin, account verification, Noise handshake and client registration. The single 2425 ms historical sample is not an acceleration benchmark.
 
-The diagnostics show the relay origin, account verification, Noise and client registration at capture time. The single handshake time is not an acceleration benchmark.
-
-![Recorded independent-thread replies](studio/docs/studio-chat.png)
-
-The chat image shows saved successful replies, including continuation after reload. Its top-right badge says connection failed: it proves retained conversation history, not an active connection at capture time. See the [evidence guide](docs/SCREENSHOTS.md) for the associated protocol records and limits. [Homepage layout](studio/docs/studio-home.png) and [Linux onboarding](studio/docs/linux-onboarding.png) are UI previews only.
+Original screenshots and dated protocol results are preserved in the [evidence guide](docs/SCREENSHOTS.md), with their original language and verification limits. The Worker remains the core product; this browser client is optional.
 
 ## License and attribution
 
