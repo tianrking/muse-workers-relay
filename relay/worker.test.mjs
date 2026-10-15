@@ -5,7 +5,7 @@ const key="relay-test-key";
 const invoke=request=>worker.fetch(request,{MUSE_RELAY_KEY:key});
 const nativeFetch=globalThis.fetch;
 function req(path,method='GET',extra={}){return new Request('https://relay.example'+path,{method,headers:{'X-Muse-Relay-Key':key,Authorization:'Bearer fake-test-token',...extra},body:method==='POST'?'{}':undefined});}
-test('health contains no credentials',async()=>{const r=await invoke(new Request('https://relay.example/health'));assert.equal(r.status,200);assert.deepEqual(await r.json(),{service:'muse-personal-relay',version:2,build:'2026-10-15'});});
+test('health contains no credentials',async()=>{const r=await invoke(new Request('https://relay.example/health'));assert.equal(r.status,200);assert.deepEqual(await r.json(),{service:'muse-personal-relay',version:3,build:'2026-10-15'});});
 test('requires device key before outbound request',async()=>{let called=false;globalThis.fetch=async()=>{called=true;};try{assert.equal((await invoke(new Request('https://relay.example/fetch_vms'))).status,401);assert.equal(called,false);}finally{globalThis.fetch=nativeFetch;}});
 test('rejects arbitrary proxy destinations and bad methods',async()=>{for(const p of ['/https://evil.example','/v1/noise?vm_id=good&host=evil','/fetch_vms?url=evil'])assert.notEqual((await invoke(req(p))).status,200);assert.equal((await invoke(req('/fetch_vms','POST'))).status,405);});
 test('preserves auth errors and streams response without retaining data',async()=>{for(const code of [401,403,429,500]){globalThis.fetch=async r=>{assert.equal(r.url,'https://api.muse.ai/fetch_vms');assert.equal(r.headers.get('X-Muse-Relay-Key'),null);assert.equal(r.headers.get('Authorization'),'Bearer fake-test-token');assert.equal(r.redirect,'manual');return new Response('upstream error',{status:code,headers:{'Set-Cookie':'secret=1'}});};try{const r=await invoke(req('/fetch_vms'));assert.equal(r.status,code);assert.equal(r.headers.get('Set-Cookie'),null);assert.equal(await r.text(),'upstream error');}finally{globalThis.fetch=nativeFetch;}}});
@@ -17,3 +17,16 @@ test('fails closed without configured secret',async()=>{assert.equal((await work
 test('preserves API JSON bytes and version header',async()=>{const body='{"vms":[{"vm_id":"test-vm","vm_name":"测试"}]}';globalThis.fetch=async r=>{assert.equal(r.headers.get('X-API-Version'),'1.0.0');return new Response(body,{headers:{'Content-Type':'application/json'}});};try{const r=await invoke(req('/fetch_vms','GET',{'X-API-Version':'1.0.0'}));assert.equal(await r.text(),body);assert.equal(r.headers.get('Content-Type'),'application/json');}finally{globalThis.fetch=nativeFetch;}});
 test('forwards refresh authorization and body unchanged',async()=>{globalThis.fetch=async r=>{assert.equal(r.headers.get('Authorization'),'Bearer hatch_refresh:fake');assert.equal(await r.text(),'{}');return new Response('{}');};try{assert.equal((await invoke(req('/device_token/refresh','POST',{Authorization:'Bearer hatch_refresh:fake'}))).status,200);}finally{globalThis.fetch=nativeFetch;}});
 test('rejects ambiguous WebSocket routing',async()=>{for(const p of ['/v1/noise','/v1/noise?vm_id=a&vm_id=b','/v1/noise?vm_id=a&target=b'])assert.equal((await invoke(req(p,'GET',{Upgrade:'websocket'}))).status,400);});
+
+test('browser entry requires same origin and an explicit auth protocol',async()=>{
+ const url='https://relay.example/web/noise?vm_id=example';
+ assert.equal((await invoke(new Request(url,{headers:{Upgrade:'websocket'}}))).status,403);
+ assert.equal((await invoke(new Request(url,{headers:{Origin:'https://evil.example',Upgrade:'websocket'}}))).status,403);
+ assert.equal((await invoke(new Request(url,{headers:{Origin:'https://relay.example',Upgrade:'websocket'}}))).status,401);
+ for(const value of ['null','{}','broken'])assert.equal((await invoke(new Request(url,{headers:{Origin:'https://relay.example',Upgrade:'websocket','Sec-WebSocket-Protocol':'muse-v1, muse-auth.'+btoa(value)}}))).status,401);
+});
+test('browser credentials become upstream headers without exposing protocol auth',async()=>{
+ const native=globalThis.fetch;let called=false;
+ globalThis.fetch=async request=>{called=true;assert.equal(request.url,'https://hatch.metaaivm.com/v1/noise?vm_id=test');assert.equal(request.headers.get('Authorization'),'Bearer browser-test');assert.equal(request.headers.get('Sec-WebSocket-Protocol'),null);assert.equal(request.headers.get('X-Muse-Relay-Key'),null);return new Response('denied',{status:401});};
+ try{const auth=btoa(JSON.stringify({key,token:'browser-test'}));const r=await invoke(new Request('https://relay.example/web/noise?vm_id=test',{headers:{Origin:'https://relay.example',Upgrade:'websocket','Sec-WebSocket-Protocol':'muse-v1, muse-auth.'+auth}}));assert.equal(r.status,401);assert.equal(await r.text(),'denied');assert.ok(called);}finally{globalThis.fetch=native;}
+});

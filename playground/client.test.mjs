@@ -1,0 +1,8 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {MuseClient} from './web/muse-client.mjs';
+function setup(){const replies=[];const client=new MuseClient({base:'https://example.test',onReply:r=>replies.push(r)});client.retired=new Set();client.turn={ack:true,session:'own-chat',parents:new Set(['user-1']),replies:new Map(),wait:{resolve(){}}};return {client,replies};}
+function event(name,payload){return {type:'event',event:name,payload};}
+test('renders scoped parentless replies like the official client',()=>{const {client,replies}=setup();client.chatEvent(event('delta.text_append',{session_id:'own-chat',message_id:'reply-1',text:'你好 🌱'}));assert.equal(replies.at(-1).text,'你好 🌱');});
+test('drops other chats and replies linked to other requests',()=>{const {client,replies}=setup();client.chatEvent(event('delta.text_append',{session_id:'other-chat',message_id:'reply-2',text:'unrelated'}));client.chatEvent(event('delta.text_append',{session_id:'own-chat',message_id:'reply-3',parent_message_id:'other-user',text:'unrelated'}));assert.equal(replies.length,0);});
+test('ignores retired replies and replaces streamed text with final text',()=>{const {client,replies}=setup();client.retired.add('old');client.chatEvent(event('delta.text_append',{session_id:'own-chat',message_id:'old',text:'old'}));assert.equal(replies.length,0);client.chatEvent(event('delta.text_append',{session_id:'own-chat',message_id:'new',text:'partial'}));client.chatEvent(event('delta.message_done',{session_id:'own-chat',message_id:'new',display_text:'final'}));assert.equal(replies.at(-1).text,'final');assert.equal(replies.at(-1).done,true);clearTimeout(client.turn.finishTimer);});

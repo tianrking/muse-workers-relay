@@ -1,5 +1,7 @@
 # 新账号 Worker 上线与验证
 
+后续更新：同日已上线 relay v3 纯网页入口，当前生产版本为 98060ffd-8972-44f7-8198-e42deac8cfc6。使用和浏览器验收见 ../playground/README.zh-CN.md。下文保留 v2 上线时的测试记录。
+
 日期：2026-10-15。账号：Tienjuiwong@gmail.com。Worker：muse。
 
 - 主地址：https://muse.2fast.cfd

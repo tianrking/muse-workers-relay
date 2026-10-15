@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-15",
+  "url": "https://muse.2fast.cfd/",
+  "worker_version": "98060ffd-8972-44f7-8198-e42deac8cfc6",
+  "runtime": "Chrome JavaScript and Web Crypto; no local backend",
+  "account_authentication": true,
+  "noise_handshake": true,
+  "device_registration": true,
+  "consecutive_turns": [
+    {
+      "sent": "请只回复：纯网页 Muse 连接成功 🌱",
+      "received": "纯网页 Muse 连接成功 🌱",
+      "matched": true
+    },
+    {
+      "sent": "再测试一轮，请只回复：第二轮也成功 🌷",
+      "received": "第二轮也成功 🌷",
+      "matched": true
+    }
+  ],
+  "credentials_in_static_source": false,
+  "limits": [
+    "Existing paired device credentials, no standalone account login",
+    "PC network uses Mihomo TUN",
+    "Text only; voice not verified",
+    "MCU not flashed in this task"
+  ]
+}
