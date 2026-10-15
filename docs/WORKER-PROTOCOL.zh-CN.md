@@ -29,3 +29,8 @@ Cloudflare 官方文档：
 - https://developers.cloudflare.com/workers/platform/limits/
 
 现有测试为本地请求/返回合同测试，未覆盖真实 Cloudflare WebSocket 运行时、Muse 鉴权或 MCU 网络。
+
+
+## 2026-10-15 后续实测
+
+已完成真实 PC 对照和 MCU 经 Muse-PC 的中转验证，详情见 ../relay/LIVE-VERIFICATION.zh-CN.md。先前仅有合同测试的结论已更新；同时保留音频限制与普通无代理 Wi-Fi 尚未完成的边界。

@@ -33,6 +33,7 @@
 #include "muse_keypad.h"
 #include "muse_link.h"
 #include "muse_settings.h"
+#include "muse_relay.h"
 #include "muse_state.h"
 #include "muse_text.h"
 #include "muse_ui.h"
@@ -902,7 +903,7 @@ static void build_hatch_page(lv_obj_t *tile)
     s_link_status = note(list, "");
     button(list, "Reset pairing", COLOR_DANGER, on_link_reset, &s_link_reset_lbl);
     s_hatch_status = note(list, "");
-    row(list, NULL, "Server", &s_hatch_host, on_hatch_host, NULL);
+    row(list, NULL, "Server", &s_hatch_host, MUSE_RELAY_ENABLED ? NULL : on_hatch_host, NULL);
     row(list, NULL, "VM ID", &s_hatch_vm, on_hatch_vm, NULL);
     row(list, NULL, "Device token", &s_hatch_token, on_hatch_token, NULL);
     button(list, "Test connection", COLOR_ACCENT, on_hatch_test, NULL);
@@ -932,6 +933,7 @@ static void tick_hatch(void)
 
     char host[MUSE_HOST_MAX + 1], vm[MUSE_VM_MAX + 1];
     muse_settings_hatch_host(host);
+    if (MUSE_RELAY_ENABLED) snprintf(host, sizeof(host), "%s", MUSE_RELAY_HOST);
     muse_settings_hatch_vm(vm);
     set_text(s_hatch_host, host);
     set_text(s_hatch_vm, vm[0] ? vm : "Not set");

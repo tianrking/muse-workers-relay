@@ -1,0 +1,152 @@
+{
+  "results": [
+    {
+      "stage": "direct.fetch_vms",
+      "status": 200,
+      "vm_count": 1,
+      "ms": 1281,
+      "vm_fields": [
+        "default",
+        "notary_token_expiration_ts",
+        "vm_auth_token",
+        "vm_id",
+        "vm_name",
+        "vm_notary_tokens",
+        "vm_state",
+        "vm_type",
+        "vm_ws_url"
+      ]
+    },
+    {
+      "stage": "direct.control",
+      "upgrade_status": 101,
+      "upgrade_ms": 1296,
+      "noise": true,
+      "registered": true
+    },
+    {
+      "stage": "direct.chat_post_started"
+    },
+    {
+      "stage": "direct.request_shape",
+      "keys": [
+        "message",
+        "output_modality"
+      ],
+      "modality": "voice"
+    },
+    {
+      "stage": "direct.chat_ack",
+      "status": 200,
+      "response_fields": [
+        "channel",
+        "is_thread",
+        "message_id",
+        "reply_to_message_id",
+        "session_id"
+      ]
+    },
+    {
+      "stage": "direct.chat",
+      "status": 200,
+      "reply_matched": false,
+      "event_count": 10,
+      "event_types": [
+        "agent.status",
+        "approvals.snapshot",
+        "delta.message_done",
+        "delta.message_start",
+        "message.user",
+        "task.status"
+      ],
+      "reply_count": 1,
+      "reply_lengths": [
+        63
+      ]
+    },
+    {
+      "stage": "direct.dictation",
+      "status": 403,
+      "response_bytes": 33,
+      "error_body": "path not allowed for device token"
+    },
+    {
+      "stage": "direct.keepalive",
+      "pong": true
+    },
+    {
+      "stage": "relay.fetch_vms",
+      "status": 200,
+      "vm_count": 1,
+      "ms": 1500,
+      "vm_fields": [
+        "default",
+        "notary_token_expiration_ts",
+        "vm_auth_token",
+        "vm_id",
+        "vm_name",
+        "vm_notary_tokens",
+        "vm_state",
+        "vm_type",
+        "vm_ws_url"
+      ]
+    },
+    {
+      "stage": "relay.control",
+      "upgrade_status": 101,
+      "upgrade_ms": 1172,
+      "noise": true,
+      "registered": true
+    },
+    {
+      "stage": "relay.chat_post_started"
+    },
+    {
+      "stage": "relay.request_shape",
+      "keys": [
+        "message",
+        "output_modality"
+      ],
+      "modality": "voice"
+    },
+    {
+      "stage": "relay.chat_ack",
+      "status": 200,
+      "response_fields": [
+        "channel",
+        "is_thread",
+        "message_id",
+        "reply_to_message_id",
+        "session_id"
+      ]
+    },
+    {
+      "stage": "relay.chat",
+      "status": 200,
+      "reply_matched": false,
+      "event_count": 10,
+      "event_types": [
+        "agent.status",
+        "approvals.snapshot",
+        "delta.message_done",
+        "delta.message_start",
+        "message.user",
+        "task.status"
+      ],
+      "reply_count": 1,
+      "reply_lengths": [
+        63
+      ]
+    },
+    {
+      "stage": "relay.dictation",
+      "status": 403,
+      "response_bytes": 33,
+      "error_body": "path not allowed for device token"
+    },
+    {
+      "stage": "relay.keepalive",
+      "pong": true
+    }
+  ]
+}

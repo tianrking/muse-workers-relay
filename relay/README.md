@@ -21,3 +21,8 @@ Custom domain muse.w0x7ce.eu bound successfully; HTTPS /health returned 200 with
 ## 2026-10-14 当前运行模式
 
 已按用户选择启用 `secrets/muse-relay.h` 的 `MUSE_RELAY_DIRECT`，统一关闭账号、控制连接、语音连接和设置 Test connection 的中转，使用官方服务。AWS → Cloudflare 的服务器端健康检查已通过，但 MCU 到中转的 TLS 尚未成功，不能视为端到端中转成功。保留中转部署与配置以便后续诊断。下一步使用能够让热点客户端访问官方服务的新加坡网络验证实际 Muse 连接。
+
+
+## Verified follow-up (2026-10-15)
+
+See [live verification](LIVE-VERIFICATION.zh-CN.md) for actual PC direct/relay and MCU results, the exact scope and current USB blocker. Deployable entry point is now worker.template.mjs; configure Cloudflare Secret MUSE_RELAY_KEY before deployment. Current production Worker was reused for live testing and was not replaced via CLI.

@@ -29,6 +29,7 @@
 #include "muse_chat.h"
 #include "muse_link.h"
 #include "muse_settings.h"
+#include "muse_relay.h"
 #include "muse_state.h"
 #include "muse_voice.h"
 #include "muse_wifi.h"
@@ -82,6 +83,7 @@ static int build_status(char *out, size_t len)
     muse_power_t p = muse_state_power();
     char host[MUSE_HOST_MAX + 1], vm[MUSE_VM_MAX + 1];
     muse_settings_hatch_host(host);
+    if (MUSE_RELAY_ENABLED) snprintf(host, sizeof(host), "%s", MUSE_RELAY_HOST);
     muse_settings_hatch_vm(vm);
 
     char ssid_e[2 * MUSE_SSID_MAX + 1], host_e[2 * MUSE_HOST_MAX + 1], vm_e[2 * MUSE_VM_MAX + 1], last_e[128];

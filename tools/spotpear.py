@@ -19,6 +19,10 @@ if idf is None:
 version = (Path(idf["path"]) / "tools/cmake/version.cmake").read_text()
 if not re.search(r"IDF_VERSION_MAJOR 6", version) or not re.search(r"IDF_VERSION_MINOR 1", version):
     raise SystemExit("This profile requires ESP-IDF 6.1")
+relay_config = ROOT / "secrets/muse-relay.h"
+if not relay_config.exists():
+    relay_config.parent.mkdir(exist_ok=True)
+    relay_config.write_text('#pragma once\n#define MUSE_RELAY_DIRECT 1\n#define MUSE_RELAY_HOST ""\n#define MUSE_RELAY_KEY ""\n')
 token_file = ROOT / "secrets/sdk-token.txt"
 token = token_file.read_text().strip() if token_file.exists() else ""
 if not re.fullmatch(r"mgst_[A-Za-z0-9_-]{43}", token):
