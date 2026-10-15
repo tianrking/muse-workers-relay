@@ -1,0 +1,7 @@
+{
+  "test": "SDK-only mint through authenticated relay",
+  "httpStatus": "401",
+  "exitCode": 0,
+  "responseMatchesOfficial": true,
+  "hasDeviceTokens": false
+}

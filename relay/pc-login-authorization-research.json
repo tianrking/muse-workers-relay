@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-15",
+  "scope": "PC research only; existing firmware and deployed Worker unchanged",
+  "conclusion": "No verified browser-login to personal Muse gadget-token issuance flow found. Preserve BLE onboarding.",
+  "tests": [
+    {
+      "test": "SDK token alone as mint authorization",
+      "httpStatus": "401",
+      "exitCode": 0,
+      "responseKeys": [
+        "title",
+        "detail",
+        "status"
+      ],
+      "hasDeviceTokens": false
+    },
+    {
+      "test": "SDK-only mint through authenticated relay",
+      "httpStatus": "401",
+      "exitCode": 0,
+      "responseMatchesOfficial": true,
+      "hasDeviceTokens": false
+    },
+    {
+      "test": "Existing paired device authorization through relay",
+      "httpStatus": "200",
+      "vmCount": 1
+    }
+  ],
+  "browser": {
+    "officialGadgetsSignedIn": true,
+    "personalMuseSignedIn": true,
+    "devicesPageInspected": true,
+    "pairedDeviceVisible": true,
+    "deviceTokenCreationOrExportControlFound": false,
+    "sessionCredentialExported": false
+  },
+  "sourceFindings": [
+    {
+      "file": "main/identity.c",
+      "line": 61,
+      "finding": "SDK token comes from firmware CONFIG_GADGET_SDK_TOKEN"
+    },
+    {
+      "file": "main/link_pairing.c",
+      "line": 1052,
+      "finding": "SDK token included in encrypted pairing_confirmed status sent over BLE to phone"
+    },
+    {
+      "file": "main/app.c",
+      "line": 813,
+      "finding": "Credentials received with refresh token are stored; legacy source-token path calls mint over network"
+    },
+    {
+      "file": "main/vm_api.h",
+      "line": 58,
+      "finding": "Mint exchanges a user/session token for a device token pair, not SDK token alone"
+    },
+    {
+      "file": "main/vm_api.c",
+      "line": 247,
+      "finding": "SDK token is an additional JSON field alongside device_id for mint and refresh"
+    },
+    {
+      "file": "main/vm_api.c",
+      "line": 112,
+      "finding": "Relay-enabled firmware routes API requests to configured relay and adds relay authentication"
+    }
+  ],
+  "relayCoverage": {
+    "supported": [
+      "fetch_vms",
+      "device_token/mint",
+      "device_token/refresh",
+      "v1/noise"
+    ],
+    "notIncluded": [
+      "BLE local traffic",
+      "Official phone app login and token issuance requests",
+      "Personal Muse website login session"
+    ],
+    "phoneRequestEndpointObserved": false
+  },
+  "limitations": [
+    "No legitimate user/session bearer acquired through a public export or app authorization flow",
+    "Did not extract browser cookies or private application storage",
+    "No successful mint with user/session bearer tested",
+    "No fresh device tokens minted, no refresh rotation, no MCU flashing",
+    "A signed-in official website does not prove that third-party pages can receive its user/session bearer"
+  ],
+  "sources": [
+    "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/main/link_pairing.c",
+    "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/main/vm_api.h",
+    "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/linux/src/musegadget/pair.py"
+  ]
+}
